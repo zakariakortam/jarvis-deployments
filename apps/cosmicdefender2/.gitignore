@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+*.log
+
+# Environment
+.env
+.env.local
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jarvis
+.jarvis/conversation.md
+.jarvis/prompts/
