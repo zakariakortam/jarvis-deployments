@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Defender</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div id="menuScreen" class="screen">
+            <div class="menu-content">
+                <h1 class="game-title">COSMIC DEFENDER</h1>
+                <p class="subtitle">Defend the galaxy from alien invasion</p>
+                <button id="startButton" class="menu-button">START GAME</button>
+                <div class="controls-info">
+                    <h3>CONTROLS</h3>
+                    <p>WASD / Arrow Keys - Move</p>
+                    <p>SPACEBAR - Shoot</p>
+                    <p>P - Pause</p>
+                </div>
+                <div class="high-score">
+                    <p>High Score: <span id="highScoreDisplay">0</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="gameOverScreen" class="screen hidden">
+            <div class="menu-content">
+                <h1 class="game-over-title">GAME OVER</h1>
+                <p id="finalScore" class="final-score">Score: 0</p>
+                <p id="newHighScore" class="new-high-score hidden">NEW HIGH SCORE!</p>
+                <button id="restartButton" class="menu-button">PLAY AGAIN</button>
+                <button id="menuButton" class="menu-button">MAIN MENU</button>
+            </div>
+        </div>
+        
+        <div id="pauseScreen" class="screen hidden">
+            <div class="menu-content">
+                <h1 class="pause-title">PAUSED</h1>
+                <p>Press P to resume</p>
+            </div>
+        </div>
+        
+        <div id="gameUI" class="game-ui hidden">
+            <div class="ui-top">
+                <div class="score">Score: <span id="scoreDisplay">0</span></div>
+                <div class="wave">Wave: <span id="waveDisplay">1</span></div>
+                <div class="lives">Lives: <span id="livesDisplay">3</span></div>
+            </div>
+            <div class="ui-bottom">
+                <div class="health-bar">
+                    <div class="health-fill" id="healthFill"></div>
+                </div>
+                <div class="power-ups" id="powerUpDisplay"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
