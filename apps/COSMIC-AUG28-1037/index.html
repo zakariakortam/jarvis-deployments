@@ -3,62 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Defender</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Space Invaders - Incredible Graphics</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
+        <div class="game-header">
+            <h1>SPACE INVADERS</h1>
+            <div class="hud">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="lives">Lives: <span id="lives">3</span></div>
+                <div class="level">Level: <span id="level">1</span></div>
+            </div>
+        </div>
+        
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         
-        <div id="menuScreen" class="screen">
-            <div class="menu-content">
-                <h1 class="game-title">COSMIC DEFENDER</h1>
-                <p class="subtitle">Defend the galaxy from alien invasion</p>
-                <button id="startButton" class="menu-button">START GAME</button>
-                <div class="controls-info">
-                    <h3>CONTROLS</h3>
-                    <p>WASD / Arrow Keys - Move</p>
-                    <p>SPACEBAR - Shoot</p>
-                    <p>P - Pause</p>
-                </div>
-                <div class="high-score">
-                    <p>High Score: <span id="highScoreDisplay">0</span></p>
-                </div>
+        <div class="game-ui">
+            <div id="startScreen" class="screen">
+                <h2>Ready to Defend Earth?</h2>
+                <p>Use ARROW KEYS to move • SPACEBAR to shoot</p>
+                <button id="startBtn">START GAME</button>
             </div>
-        </div>
-        
-        <div id="gameOverScreen" class="screen hidden">
-            <div class="menu-content">
-                <h1 class="game-over-title">GAME OVER</h1>
-                <p id="finalScore" class="final-score">Score: 0</p>
-                <p id="newHighScore" class="new-high-score hidden">NEW HIGH SCORE!</p>
-                <button id="restartButton" class="menu-button">PLAY AGAIN</button>
-                <button id="menuButton" class="menu-button">MAIN MENU</button>
+            
+            <div id="gameOverScreen" class="screen hidden">
+                <h2>Game Over</h2>
+                <p>Your Final Score: <span id="finalScore">0</span></p>
+                <button id="restartBtn">PLAY AGAIN</button>
             </div>
-        </div>
-        
-        <div id="pauseScreen" class="screen hidden">
-            <div class="menu-content">
-                <h1 class="pause-title">PAUSED</h1>
-                <p>Press P to resume</p>
-            </div>
-        </div>
-        
-        <div id="gameUI" class="game-ui hidden">
-            <div class="ui-top">
-                <div class="score">Score: <span id="scoreDisplay">0</span></div>
-                <div class="wave">Wave: <span id="waveDisplay">1</span></div>
-                <div class="lives">Lives: <span id="livesDisplay">3</span></div>
-            </div>
-            <div class="ui-bottom">
-                <div class="health-bar">
-                    <div class="health-fill" id="healthFill"></div>
-                </div>
-                <div class="power-ups" id="powerUpDisplay"></div>
+            
+            <div id="pauseScreen" class="screen hidden">
+                <h2>Paused</h2>
+                <p>Press P to continue</p>
             </div>
         </div>
     </div>
     
+    <script src="assets.js"></script>
+    <script src="particles.js"></script>
+    <script src="bullet.js"></script>
+    <script src="player.js"></script>
+    <script src="invader.js"></script>
     <script src="game.js"></script>
 </body>
 </html>
