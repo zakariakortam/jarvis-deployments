@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PONG Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>PONG</h1>
+            <div class="score-board">
+                <div class="score">
+                    <span class="label">Player</span>
+                    <span id="playerScore">0</span>
+                </div>
+                <div class="score">
+                    <span class="label">Computer</span>
+                    <span id="computerScore">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+            <div id="gameMessage" class="game-message">
+                <h2>Welcome to PONG!</h2>
+                <p>Use W/S keys to move your paddle</p>
+                <p>Press SPACE to start</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>Controls</h3>
+                <p><strong>W/S</strong> - Move left paddle</p>
+                <p><strong>↑/↓</strong> - Move right paddle (or AI)</p>
+                <p><strong>SPACE</strong> - Start/Restart game</p>
+                <p><strong>P</strong> - Pause/Resume</p>
+            </div>
+            <div class="control-group">
+                <h3>Game Mode</h3>
+                <button id="vsAI" class="mode-btn active">vs AI</button>
+                <button id="vsPlayer" class="mode-btn">vs Player</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>

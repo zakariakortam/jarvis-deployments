@@ -1,0 +1,241 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.game-header {
+    margin-bottom: 20px;
+}
+
+.game-header h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px #00ff41;
+    color: #00ff41;
+    letter-spacing: 0.5rem;
+}
+
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-bottom: 20px;
+}
+
+.score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.score .label {
+    font-size: 1.2rem;
+    color: #ccc;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+
+.score span:last-child {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+}
+
+.canvas-container {
+    position: relative;
+    margin: 0 auto;
+    border: 3px solid #00ff41;
+    border-radius: 10px;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 65, 0.3),
+        inset 0 0 20px rgba(0, 255, 65, 0.1);
+    background: #000;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    display: block;
+    background: #000;
+    width: 100%;
+    height: auto;
+}
+
+.game-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    border-radius: 10px;
+    border: 2px solid #00ff41;
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
+
+.game-message h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+}
+
+.game-message p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.game-message.hidden {
+    display: none;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 40px;
+}
+
+.control-group {
+    flex: 1;
+    text-align: left;
+}
+
+.control-group h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #00ff41;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+
+.control-group p {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #ccc;
+}
+
+.control-group strong {
+    color: #00ff41;
+}
+
+.mode-btn {
+    background: transparent;
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 10px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+
+.mode-btn:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+.mode-btn.active {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    .game-header h1 {
+        font-size: 2rem;
+        letter-spacing: 0.3rem;
+    }
+    
+    .score-board {
+        gap: 40px;
+    }
+    
+    .score .label {
+        font-size: 1rem;
+    }
+    
+    .score span:last-child {
+        font-size: 2rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .control-group {
+        text-align: center;
+    }
+    
+    .game-message {
+        padding: 20px;
+    }
+    
+    .game-message h2 {
+        font-size: 1.5rem;
+    }
+    
+    .game-message p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.5rem;
+        letter-spacing: 0.2rem;
+    }
+    
+    .score-board {
+        gap: 20px;
+    }
+    
+    .canvas-container {
+        border-width: 2px;
+    }
+}
+
+/* Pulsing effect for active elements */
+@keyframes pulse {
+    0% { box-shadow: 0 0 5px rgba(0, 255, 65, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 65, 0.3); }
+}
+
+.canvas-container {
+    animation: pulse 2s infinite;
+}
