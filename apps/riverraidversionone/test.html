@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>River Raid Test</title>
+    <style>
+        body { 
+            background: #000; 
+            color: #fff; 
+            font-family: monospace; 
+            padding: 20px;
+        }
+        #gameCanvas { 
+            border: 2px solid #fff; 
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>River Raid Debug</h1>
+    <div id="debug">Loading...</div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <script>
+        console.log("Script loading...");
+        
+        const debug = document.getElementById('debug');
+        debug.innerHTML = "Script loaded. Checking canvas...";
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        debug.innerHTML += "<br>Canvas found: " + (canvas ? "YES" : "NO");
+        debug.innerHTML += "<br>Context found: " + (ctx ? "YES" : "NO");
+        
+        // Simple test draw
+        if (ctx) {
+            ctx.fillStyle = '#0066cc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(100, 100, 50, 50);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '20px monospace';
+            ctx.fillText('Canvas Working!', 200, 200);
+            
+            debug.innerHTML += "<br>Test draw completed!";
+        }
+        
+        // Test if main game.js loads
+        const script = document.createElement('script');
+        script.src = 'game.js';
+        script.onload = () => {
+            debug.innerHTML += "<br>game.js loaded successfully!";
+        };
+        script.onerror = () => {
+            debug.innerHTML += "<br>ERROR: game.js failed to load!";
+        };
+        document.head.appendChild(script);
+        
+    </script>
+</body>
+</html>

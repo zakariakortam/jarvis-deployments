@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>River Raid - Classic Atari Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #gameContainer {
+            text-align: center;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #fff;
+            background: #001f3f;
+        }
+        
+        #ui {
+            color: #fff;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        
+        #controls {
+            color: #fff;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui">
+            <span id="score">SCORE: 0</span>
+            <span style="margin-left: 30px;" id="fuel">FUEL: 100%</span>
+            <span style="margin-left: 30px;" id="lives">LIVES: 3</span>
+        </div>
+        <div id="controls">
+            Use ARROW KEYS to move, SPACEBAR to shoot, R to restart
+        </div>
+        <div id="gameOver" class="game-over">
+            <h2>GAME OVER</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <p>Press R to restart</p>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
