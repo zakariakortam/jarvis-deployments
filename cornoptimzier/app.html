@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corn Dry Thinning - Acid Set Point Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+            padding: 24px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            opacity: 0.9;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+
+        .status-bar {
+            background: white;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .status-items {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a73e8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #1a73e8;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+        }
+
+        .unit {
+            color: #666;
+            font-size: 12px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #4caf50;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .result-value {
+            font-size: 56px;
+            font-weight: 700;
+            color: #2e7d32;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .confidence {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .confidence-bar {
+            width: 200px;
+            height: 12px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+            transition: width 0.5s ease-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .metric-value.positive {
+            color: #4caf50;
+        }
+
+        .metric-value.negative {
+            color: #f44336;
+        }
+
+        .recommendations {
+            margin-top: 20px;
+        }
+
+        .recommendation {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .recommendation.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .recommendation.suggestion {
+            background: #cfe2ff;
+            border-left: 4px solid #0d6efd;
+            color: #084298;
+        }
+
+        .recommendation.alert {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #842029;
+        }
+
+        .recommendation-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .monitoring {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .monitor-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .monitor-item:hover {
+            border-color: #1a73e8;
+            transform: translateY(-2px);
+        }
+
+        .monitor-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .monitor-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a73e8;
+        }
+
+        .history-chart {
+            height: 300px;
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .monitoring {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .result-value {
+                font-size: 42px;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: #1a73e8;
+        }
+
+        .tab.active {
+            color: #1a73e8;
+            border-bottom-color: #1a73e8;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-banner {
+            background: #f44336;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .success-banner {
+            background: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1> Corn Dry Thinning Optimizer</h1>
+            <p>Advanced Acid Set Point Optimization System</p>
+        </div>
+    </header>
+
+    <div class="status-bar">
+        <div class="container">
+            <div class="status-items">
+                <div class="status-item">
+                    <div class="status-indicator"></div>
+                    <span>System Online</span>
+                </div>
+                <div class="status-item">
+                    <span id="currentTime"></span>
+                </div>
+                <div class="status-item">
+                    <span>Last Update: <span id="lastUpdate">Never</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="alertContainer"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('optimizer')">Optimizer</button>
+            <button class="tab" onclick="switchTab('monitoring')">Real-time Monitoring</button>
+            <button class="tab" onclick="switchTab('history')">Historical Analysis</button>
+        </div>
+
+        <!-- Optimizer Tab -->
+        <div id="optimizer" class="tab-content active">
+            <div class="grid">
+                <!-- Input Parameters -->
+                <div class="card">
+                    <h2>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Process Parameters
+                    </h2>
+                    <form id="optimizationForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="currentTemp">
+                                    Current Temperature <span class="unit">(°C)</span>
+                                </label>
+                                <input type="number" id="currentTemp" value="49.8" min="40" max="60" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="currentFlow">
+                                    Flow Rate <span class="unit">(L/min)</span>
+                                </label>
+                                <input type="number" id="currentFlow" value="195" min="50" max="400" step="1" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cornMoisture">
+                                    Corn Moisture <span class="unit">(%)</span>
+                                </label>
+                                <input type="number" id="cornMoisture" value="48" min="40" max="55" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="steepTime">
+                                    Steep Time <span class="unit">(hours)</span>
+                                </label>
+                                <input type="number" id="steepTime" value="44" min="30" max="60" step="1" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="targetProtein">
+                                    Target Protein Recovery <span class="unit">(%)</span>
+                                </label>
+                                <input type="number" id="targetProtein" value="92" min="80" max="99" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="targetStarch">
+                                    Target Starch Purity <span class="unit">(%)</span>
+                                </label>
+                                <input type="number" id="targetStarch" value="99.5" min="95" max="99.9" step="0.1" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="optimizeBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Optimize Acid Set Point
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Results -->
+                <div class="card">
+                    <h2>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                        </svg>
+                        Optimization Results
+                    </h2>
+                    <div id="results" style="display: none;">
+                        <div class="result-box">
+                            <div style="position: relative; z-index: 1;">Optimal Acid Set Point (pH)</div>
+                            <div class="result-value" id="optimalSetPoint">--</div>
+                            <div class="confidence">
+                                <span>Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" id="confidenceBar"></div>
+                                </div>
+                                <span id="confidenceValue">--%</span>
+                            </div>
+                        </div>
+
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-label">Temp Factor</div>
+                                <div class="metric-value" id="tempFactor">--</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Flow Factor</div>
+                                <div class="metric-value" id="flowFactor">--</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Moisture Factor</div>
+                                <div class="metric-value" id="moistureFactor">--</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Quality Factor</div>
+                                <div class="metric-value" id="qualityFactor">--</div>
+                            </div>
+                        </div>
+
+                        <div class="recommendations" id="recommendations"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <!-- Performance Simulation -->
+                <div class="card">
+                    <h2>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-5h2v5zm4 0h-2v-3h2v3zm0-5h-2v-2h2v2zm4 5h-2V7h2v10z"/>
+                        </svg>
+                        Performance Simulation
+                    </h2>
+                    <div id="simulation" style="display: none;">
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-label">Predicted Yield</div>
+                                <div class="metric-value" id="predictedYield">--</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Protein Recovery</div>
+                                <div class="metric-value" id="proteinRecovery">--</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Starch Purity</div>
+                                <div class="metric-value" id="starchPurity">--</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Process Time</div>
+                                <div class="metric-value" id="processTime">--</div>
+                            </div>
+                        </div>
+
+                        <h3 style="margin-top: 20px; margin-bottom: 10px;"> Economic Impact</h3>
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-label">Daily Benefit</div>
+                                <div class="metric-value positive">$<span id="dailyBenefit">--</span></div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Annual Benefit</div>
+                                <div class="metric-value positive">$<span id="annualBenefit">--</span></div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Yield Improvement</div>
+                                <div class="metric-value positive"><span id="yieldImprovement">--</span>%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Control -->
+                <div class="card">
+                    <h2>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                        </svg>
+                        Process Control Actions
+                    </h2>
+                    <div style="display: grid; gap: 10px;">
+                        <button onclick="applyOptimalSetpoint()" style="background: #4caf50;">
+                            Apply Optimal Setpoint
+                        </button>
+                        <button onclick="runSimulation()" style="background: #ff9800;">
+                            Run What-If Simulation
+                        </button>
+                        <button onclick="exportResults()" style="background: #2196f3;">
+                            Export Results
+                        </button>
+                        <button onclick="scheduleOptimization()" style="background: #9c27b0;">
+                            Schedule Auto-Optimization
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Tab -->
+        <div id="monitoring" class="tab-content">
+            <div class="card">
+                <h2>
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    </svg>
+                    Real-time Process Monitoring
+                </h2>
+                <div class="monitoring" id="monitoringData">
+                    <div class="monitor-item">
+                        <div class="monitor-label">Set Point</div>
+                        <div class="monitor-value" id="monSetPoint">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Actual pH</div>
+                        <div class="monitor-value" id="monActualPH">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Temperature</div>
+                        <div class="monitor-value" id="monTemp">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Flow Rate</div>
+                        <div class="monitor-value" id="monFlow">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Steam PSI</div>
+                        <div class="monitor-value" id="monSteam">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Agitator RPM</div>
+                        <div class="monitor-value" id="monAgitator">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Tank Level %</div>
+                        <div class="monitor-value" id="monTankLevel">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Status</div>
+                        <div class="monitor-value" style="color: #4caf50;">NORMAL</div>
+                    </div>
+                </div>
+                
+                <div class="history-chart">
+                    <span>Real-time trend chart would be displayed here</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div class="card">
+                <h2>
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                    </svg>
+                    Historical Analysis
+                </h2>
+                <div class="history-chart">
+                    <span>Historical optimization data and trends would be displayed here</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/projects/corn-optimizer/CornOptimizer.js"></script>
+    <script>
+        // Initialize
+        const optimizer = new CornOptimizer();
+        let currentOptimizationResult = null;
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Form submission handler
+        document.getElementById('optimizationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('optimizeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Optimizing...';
+            
+            // Clear any existing alerts
+            document.getElementById('alertContainer').innerHTML = '';
+            
+            try {
+                // Get form values
+                const processData = {
+                    currentTemp: parseFloat(document.getElementById('currentTemp').value),
+                    currentFlow: parseFloat(document.getElementById('currentFlow').value),
+                    cornMoisture: parseFloat(document.getElementById('cornMoisture').value),
+                    targetProteinRecovery: parseFloat(document.getElementById('targetProtein').value) / 100,
+                    targetStarchPurity: parseFloat(document.getElementById('targetStarch').value) / 100,
+                    historicalData: [] // Would be loaded from backend
+                };
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Calculate optimization
+                currentOptimizationResult = optimizer.calculateOptimalSetPoint(processData);
+                
+                // Display results
+                displayResults(currentOptimizationResult);
+                
+                // Run simulation
+                const simulationParams = {
+                    acidSetPoint: currentOptimizationResult.optimalSetPoint,
+                    temperature: processData.currentTemp,
+                    flowRate: processData.currentFlow,
+                    steepTime: parseFloat(document.getElementById('steepTime').value),
+                    cornMoisture: processData.cornMoisture
+                };
+                
+                const simulation = optimizer.simulatePerformance(simulationParams);
+                displaySimulation(simulation);
+                
+                // Update last update time
+                document.getElementById('lastUpdate').textContent = 
+                    new Date().toLocaleTimeString();
+                
+                // Show success message
+                showAlert('Optimization completed successfully!', 'success');
+                
+            } catch (error) {
+                showAlert('Error during optimization: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Optimize Acid Set Point
+                `;
+            }
+        });
+
+        function displayResults(result) {
+            document.getElementById('results').style.display = 'block';
+            
+            // Optimal set point
+            document.getElementById('optimalSetPoint').textContent = result.optimalSetPoint;
+            
+            // Confidence
+            const confidencePercent = Math.round(result.confidence * 100);
+            document.getElementById('confidenceBar').style.width = `${confidencePercent}%`;
+            document.getElementById('confidenceValue').textContent = `${confidencePercent}%`;
+            
+            // Adjustment factors with color coding
+            const factors = {
+                tempFactor: result.adjustmentFactors.temperature,
+                flowFactor: result.adjustmentFactors.flowRate,
+                moistureFactor: result.adjustmentFactors.moisture,
+                qualityFactor: result.adjustmentFactors.quality
+            };
+            
+            Object.entries(factors).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                element.textContent = value.toFixed(3);
+                element.className = 'metric-value ' + (value > 0 ? 'positive' : value < 0 ? 'negative' : '');
+            });
+            
+            // Recommendations
+            const recContainer = document.getElementById('recommendations');
+            recContainer.innerHTML = '';
+            
+            if (result.recommendations.length === 0) {
+                recContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #4caf50;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom: 10px;">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <div style="font-size: 18px; font-weight: 500;">All parameters are optimal!</div>
+                    </div>
+                `;
+            } else {
+                result.recommendations.forEach(rec => {
+                    const icon = rec.type === 'warning' ? '️' : 
+                                rec.type === 'alert' ? '' : 'ℹ️';
+                    
+                    const recEl = document.createElement('div');
+                    recEl.className = `recommendation ${rec.type}`;
+                    recEl.innerHTML = `
+                        <span class="recommendation-icon">${icon}</span>
+                        <div>${rec.message}</div>
+                    `;
+                    recContainer.appendChild(recEl);
+                });
+            }
+        }
+
+        function displaySimulation(simulation) {
+            document.getElementById('simulation').style.display = 'block';
+            
+            // Performance metrics
+            document.getElementById('predictedYield').textContent = 
+                (simulation.predictedYield * 100).toFixed(1) + '%';
+            document.getElementById('proteinRecovery').textContent = 
+                (simulation.proteinRecovery * 100).toFixed(1) + '%';
+            document.getElementById('starchPurity').textContent = 
+                (simulation.starchPurity * 100).toFixed(2) + '%';
+            document.getElementById('processTime').textContent = 
+                simulation.estimatedProcessTime + 'h';
+            
+            // Economic impact
+            document.getElementById('dailyBenefit').textContent = 
+                simulation.economicImpact.dailyBenefit.toLocaleString();
+            document.getElementById('annualBenefit').textContent = 
+                simulation.economicImpact.annualBenefit.toLocaleString();
+            document.getElementById('yieldImprovement').textContent = 
+                simulation.economicImpact.yieldImprovement;
+        }
+
+        // Update monitoring data
+        function updateMonitoring() {
+            const data = optimizer.getMonitoringData();
+            
+            document.getElementById('monSetPoint').textContent = data.currentSetPoint;
+            document.getElementById('monActualPH').textContent = data.actualPH;
+            document.getElementById('monTemp').textContent = data.temperature + '°C';
+            document.getElementById('monFlow').textContent = data.flowRate + ' L/min';
+            document.getElementById('monSteam').textContent = data.steamPressure;
+            document.getElementById('monAgitator').textContent = data.agitatorSpeed;
+            document.getElementById('monTankLevel').textContent = data.tankLevel + '%';
+        }
+
+        // Update monitoring every 5 seconds
+        setInterval(updateMonitoring, 5000);
+        updateMonitoring();
+
+        // Utility functions
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'success-banner' : 'alert-banner';
+            const icon = type === 'success' ? '' : '️';
+            
+            alertContainer.innerHTML = `
+                <div class="${alertClass}">
+                    <span>${icon}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        function applyOptimalSetpoint() {
+            if (!currentOptimizationResult) {
+                showAlert('Please run optimization first', 'error');
+                return;
+            }
+            
+            // In production, this would send command to control system
+            showAlert(`Applying set point: ${currentOptimizationResult.optimalSetPoint} pH`, 'success');
+        }
+
+        function runSimulation() {
+            showAlert('Opening simulation interface...', 'success');
+        }
+
+        function exportResults() {
+            if (!currentOptimizationResult) {
+                showAlert('No results to export', 'error');
+                return;
+            }
+            
+            // Create CSV content
+            const csvContent = `Optimization Results
+Date,${new Date().toISOString()}
+Optimal Set Point,${currentOptimizationResult.optimalSetPoint}
+Confidence,${(currentOptimizationResult.confidence * 100).toFixed(1)}%
+Temperature Factor,${currentOptimizationResult.adjustmentFactors.temperature}
+Flow Factor,${currentOptimizationResult.adjustmentFactors.flowRate}
+Moisture Factor,${currentOptimizationResult.adjustmentFactors.moisture}
+Quality Factor,${currentOptimizationResult.adjustmentFactors.quality}`;
+            
+            // Download file
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `corn-optimization-${new Date().toISOString()}.csv`;
+            a.click();
+            
+            showAlert('Results exported successfully', 'success');
+        }
+
+        function scheduleOptimization() {
+            showAlert('Auto-optimization scheduled for every 4 hours', 'success');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corn Dry Thinning - Acid Set Point Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #1a73e8;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        header p {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a73e8;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        .unit {
+            color: #666;
+            font-size: 12px;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+
+        .confidence {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .confidence-bar {
+            width: 200px;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.5s;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .recommendations {
+            margin-top: 20px;
+        }
+
+        .recommendation {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .recommendation.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .recommendation.suggestion {
+            background: #cfe2ff;
+            border-left: 4px solid #0d6efd;
+        }
+
+        .recommendation.alert {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .recommendation-icon {
+            font-size: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .monitoring {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .monitor-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .monitor-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .monitor-value {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .monitoring {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Corn Dry Thinning Optimizer</h1>
+            <p>Acid Set Point Optimization System</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Input Parameters -->
+            <div class="card">
+                <h2>Process Parameters</h2>
+                <form id="optimizationForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="currentTemp">
+                                Current Temperature <span class="unit">(°C)</span>
+                            </label>
+                            <input type="number" id="currentTemp" value="49.8" min="40" max="60" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentFlow">
+                                Flow Rate <span class="unit">(L/min)</span>
+                            </label>
+                            <input type="number" id="currentFlow" value="195" min="50" max="400" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cornMoisture">
+                                Corn Moisture <span class="unit">(%)</span>
+                            </label>
+                            <input type="number" id="cornMoisture" value="48" min="40" max="55" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="steepTime">
+                                Steep Time <span class="unit">(hours)</span>
+                            </label>
+                            <input type="number" id="steepTime" value="44" min="30" max="60" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="targetProtein">
+                                Target Protein Recovery <span class="unit">(%)</span>
+                            </label>
+                            <input type="number" id="targetProtein" value="92" min="80" max="99" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="targetStarch">
+                                Target Starch Purity <span class="unit">(%)</span>
+                            </label>
+                            <input type="number" id="targetStarch" value="99.5" min="95" max="99.9" step="0.1" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="optimizeBtn">
+                        Optimize Acid Set Point
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div class="card">
+                <h2>Optimization Results</h2>
+                <div id="results" style="display: none;">
+                    <div class="result-box">
+                        <div>Optimal Acid Set Point (pH)</div>
+                        <div class="result-value" id="optimalSetPoint">--</div>
+                        <div class="confidence">
+                            <span>Confidence:</span>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceBar"></div>
+                            </div>
+                            <span id="confidenceValue">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-label">Temp Factor</div>
+                            <div class="metric-value" id="tempFactor">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Flow Factor</div>
+                            <div class="metric-value" id="flowFactor">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Moisture Factor</div>
+                            <div class="metric-value" id="moistureFactor">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Quality Factor</div>
+                            <div class="metric-value" id="qualityFactor">--</div>
+                        </div>
+                    </div>
+
+                    <div class="recommendations" id="recommendations"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Performance Simulation -->
+            <div class="card">
+                <h2>Performance Simulation</h2>
+                <div id="simulation" style="display: none;">
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-label">Predicted Yield</div>
+                            <div class="metric-value" id="predictedYield">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Protein Recovery</div>
+                            <div class="metric-value" id="proteinRecovery">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Starch Purity</div>
+                            <div class="metric-value" id="starchPurity">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Process Time</div>
+                            <div class="metric-value" id="processTime">--</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Economic Impact</h3>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-label">Daily Benefit</div>
+                            <div class="metric-value">$<span id="dailyBenefit">--</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Annual Benefit</div>
+                            <div class="metric-value">$<span id="annualBenefit">--</span></div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Yield Improvement</div>
+                            <div class="metric-value"><span id="yieldImprovement">--</span>%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Monitoring -->
+            <div class="card">
+                <h2>Real-time Monitoring</h2>
+                <div class="monitoring" id="monitoring">
+                    <div class="monitor-item">
+                        <div class="monitor-label">Set Point</div>
+                        <div class="monitor-value" id="monSetPoint">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Actual pH</div>
+                        <div class="monitor-value" id="monActualPH">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Temperature</div>
+                        <div class="monitor-value" id="monTemp">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Flow Rate</div>
+                        <div class="monitor-value" id="monFlow">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Steam PSI</div>
+                        <div class="monitor-value" id="monSteam">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Agitator RPM</div>
+                        <div class="monitor-value" id="monAgitator">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Tank Level %</div>
+                        <div class="monitor-value" id="monTankLevel">--</div>
+                    </div>
+                    <div class="monitor-item">
+                        <div class="monitor-label">Status</div>
+                        <div class="monitor-value" style="color: #4caf50;">NORMAL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Include the CornOptimizer class
+        class CornOptimizer {
+            constructor() {
+                this.constraints = {
+                    acidSetPoint: { min: 3.5, max: 4.5, optimal: 4.0 },
+                    temperature: { min: 45, max: 55, optimal: 50 },
+                    flowRate: { min: 100, max: 300, optimal: 200 },
+                    steepTime: { min: 36, max: 52, optimal: 44 },
+                    sulfurDioxide: { min: 0.1, max: 0.2, optimal: 0.15 },
+                    moistureContent: { min: 45, max: 50, optimal: 48 }
+                };
+                
+                this.qualityTargets = {
+                    proteinRecovery: 0.92,
+                    starchPurity: 0.995,
+                    fiberRemoval: 0.85,
+                    yieldEfficiency: 0.88
+                };
+            }
+
+            calculateOptimalSetPoint(processData) {
+                const {
+                    currentTemp,
+                    currentFlow,
+                    cornMoisture,
+                    targetProteinRecovery,
+                    targetStarchPurity,
+                    historicalData = []
+                } = processData;
+
+                let baseSetPoint = this.constraints.acidSetPoint.optimal;
+                
+                const tempFactor = this.calculateTempAdjustment(currentTemp);
+                const flowFactor = this.calculateFlowAdjustment(currentFlow);
+                const moistureFactor = this.calculateMoistureAdjustment(cornMoisture);
+                const qualityFactor = this.calculateQualityAdjustment(
+                    targetProteinRecovery,
+                    targetStarchPurity
+                );
+                const historicalFactor = this.calculateHistoricalAdjustment(historicalData);
+                
+                let optimalSetPoint = baseSetPoint * 
+                    (1 + tempFactor + flowFactor + moistureFactor + qualityFactor + historicalFactor);
+                
+                optimalSetPoint = Math.max(
+                    this.constraints.acidSetPoint.min,
+                    Math.min(this.constraints.acidSetPoint.max, optimalSetPoint)
+                );
+                
+                const confidence = this.calculateConfidence(processData, historicalData);
+                const recommendations = this.generateRecommendations(processData, optimalSetPoint);
+                
+                return {
+                    optimalSetPoint: Number(optimalSetPoint.toFixed(3)),
+                    confidence,
+                    recommendations,
+                    adjustmentFactors: {
+                        temperature: tempFactor,
+                        flowRate: flowFactor,
+                        moisture: moistureFactor,
+                        quality: qualityFactor,
+                        historical: historicalFactor
+                    }
+                };
+            }
+
+            calculateTempAdjustment(currentTemp) {
+                const optimal = this.constraints.temperature.optimal;
+                const deviation = Math.abs(currentTemp - optimal);
+                
+                if (deviation <= 2) return 0;
+                
+                const adjustment = deviation * 0.02;
+                return currentTemp < optimal ? adjustment : -adjustment;
+            }
+
+            calculateFlowAdjustment(currentFlow) {
+                const optimal = this.constraints.flowRate.optimal;
+                const deviation = Math.abs(currentFlow - optimal);
+                
+                if (deviation <= 20) return 0;
+                
+                const adjustment = (deviation / 10) * 0.01;
+                return currentFlow > optimal ? adjustment : -adjustment;
+            }
+
+            calculateMoistureAdjustment(cornMoisture) {
+                const optimal = this.constraints.moistureContent.optimal;
+                const deviation = Math.abs(cornMoisture - optimal);
+                
+                if (deviation <= 1) return 0;
+                
+                const adjustment = deviation * 0.03;
+                return cornMoisture > optimal ? adjustment : -adjustment;
+            }
+
+            calculateQualityAdjustment(targetProtein, targetStarch) {
+                let adjustment = 0;
+                
+                if (targetProtein > this.qualityTargets.proteinRecovery) {
+                    adjustment += (targetProtein - this.qualityTargets.proteinRecovery) * 0.5;
+                }
+                
+                if (targetStarch > this.qualityTargets.starchPurity) {
+                    adjustment += (targetStarch - this.qualityTargets.starchPurity) * 0.3;
+                }
+                
+                return adjustment;
+            }
+
+            calculateHistoricalAdjustment(historicalData) {
+                if (!historicalData || historicalData.length < 5) return 0;
+                
+                const recentData = historicalData.slice(-10);
+                let totalDeviation = 0;
+                
+                recentData.forEach(record => {
+                    if (record.actualYield && record.targetYield) {
+                        const yieldRatio = record.actualYield / record.targetYield;
+                        totalDeviation += (1 - yieldRatio);
+                    }
+                });
+                
+                return totalDeviation / recentData.length * 0.1;
+            }
+
+            calculateConfidence(processData, historicalData) {
+                let confidence = 0.5;
+                
+                if (processData.currentTemp) confidence += 0.1;
+                if (processData.currentFlow) confidence += 0.1;
+                if (processData.cornMoisture) confidence += 0.1;
+                
+                if (historicalData && historicalData.length > 0) {
+                    confidence += Math.min(0.2, historicalData.length * 0.02);
+                }
+                
+                return Math.min(0.95, confidence);
+            }
+
+            generateRecommendations(processData, optimalSetPoint) {
+                const recommendations = [];
+                
+                if (processData.currentTemp < this.constraints.temperature.min) {
+                    recommendations.push({
+                        type: 'warning',
+                        parameter: 'temperature',
+                        message: `Temperature (${processData.currentTemp}°C) is below minimum. Increase to at least ${this.constraints.temperature.min}°C for optimal results.`
+                    });
+                }
+                
+                if (Math.abs(processData.currentFlow - this.constraints.flowRate.optimal) > 50) {
+                    recommendations.push({
+                        type: 'suggestion',
+                        parameter: 'flowRate',
+                        message: `Consider adjusting flow rate closer to ${this.constraints.flowRate.optimal} L/min for better efficiency.`
+                    });
+                }
+                
+                if (optimalSetPoint === this.constraints.acidSetPoint.min || 
+                    optimalSetPoint === this.constraints.acidSetPoint.max) {
+                    recommendations.push({
+                        type: 'alert',
+                        parameter: 'acidSetPoint',
+                        message: 'Calculated set point is at constraint boundary. Review process parameters.'
+                    });
+                }
+                
+                return recommendations;
+            }
+
+            simulatePerformance(parameters) {
+                const {
+                    acidSetPoint,
+                    temperature,
+                    flowRate,
+                    steepTime,
+                    cornMoisture
+                } = parameters;
+                
+                const baseYield = 0.85;
+                
+                const acidFactor = 1 - Math.abs(acidSetPoint - this.constraints.acidSetPoint.optimal) * 0.1;
+                const tempFactor = 1 - Math.abs(temperature - this.constraints.temperature.optimal) * 0.02;
+                const flowFactor = 1 - Math.abs(flowRate - this.constraints.flowRate.optimal) * 0.001;
+                
+                const predictedYield = baseYield * acidFactor * tempFactor * flowFactor;
+                const proteinRecovery = 0.92 * acidFactor * 0.95;
+                const starchPurity = 0.995 * (1 - Math.abs(acidSetPoint - 4.0) * 0.01);
+                
+                return {
+                    predictedYield: Number(predictedYield.toFixed(3)),
+                    proteinRecovery: Number(proteinRecovery.toFixed(3)),
+                    starchPurity: Number(starchPurity.toFixed(4)),
+                    estimatedProcessTime: steepTime,
+                    economicImpact: this.calculateEconomicImpact(predictedYield, parameters)
+                };
+            }
+
+            calculateEconomicImpact(yield, parameters) {
+                const cornPricePerTon = 250;
+                const acidCostPerUnit = 50;
+                const energyCostPerHour = 100;
+                
+                const throughputTonsPerDay = 100;
+                const revenuePerTon = 400;
+                
+                const additionalYield = (yield - 0.85) * throughputTonsPerDay;
+                const additionalRevenue = additionalYield * revenuePerTon;
+                const additionalAcidCost = Math.abs(parameters.acidSetPoint - 4.0) * acidCostPerUnit;
+                
+                const netBenefit = additionalRevenue - additionalAcidCost;
+                
+                return {
+                    dailyBenefit: Number(netBenefit.toFixed(2)),
+                    annualBenefit: Number((netBenefit * 350).toFixed(2)),
+                    yieldImprovement: Number(((yield - 0.85) * 100).toFixed(2))
+                };
+            }
+
+            getMonitoringData() {
+                return {
+                    timestamp: new Date(),
+                    currentSetPoint: 4.05,
+                    actualPH: 4.03,
+                    temperature: 49.8,
+                    flowRate: 195,
+                    steamPressure: 2.1,
+                    agitatorSpeed: 45,
+                    tankLevel: 78
+                };
+            }
+        }
+
+        // Initialize the optimizer
+        const optimizer = new CornOptimizer();
+
+        // Form submission handler
+        document.getElementById('optimizationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('optimizeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Optimizing...';
+            
+            // Get form values
+            const processData = {
+                currentTemp: parseFloat(document.getElementById('currentTemp').value),
+                currentFlow: parseFloat(document.getElementById('currentFlow').value),
+                cornMoisture: parseFloat(document.getElementById('cornMoisture').value),
+                targetProteinRecovery: parseFloat(document.getElementById('targetProtein').value) / 100,
+                targetStarchPurity: parseFloat(document.getElementById('targetStarch').value) / 100,
+                historicalData: [] // Would be loaded from backend in production
+            };
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Calculate optimization
+            const result = optimizer.calculateOptimalSetPoint(processData);
+            
+            // Display results
+            displayResults(result);
+            
+            // Run simulation
+            const simulationParams = {
+                acidSetPoint: result.optimalSetPoint,
+                temperature: processData.currentTemp,
+                flowRate: processData.currentFlow,
+                steepTime: parseFloat(document.getElementById('steepTime').value),
+                cornMoisture: processData.cornMoisture
+            };
+            
+            const simulation = optimizer.simulatePerformance(simulationParams);
+            displaySimulation(simulation);
+            
+            btn.disabled = false;
+            btn.innerHTML = 'Optimize Acid Set Point';
+        });
+
+        function displayResults(result) {
+            document.getElementById('results').style.display = 'block';
+            
+            // Optimal set point
+            document.getElementById('optimalSetPoint').textContent = result.optimalSetPoint;
+            
+            // Confidence
+            const confidencePercent = Math.round(result.confidence * 100);
+            document.getElementById('confidenceBar').style.width = `${confidencePercent}%`;
+            document.getElementById('confidenceValue').textContent = `${confidencePercent}%`;
+            
+            // Adjustment factors
+            document.getElementById('tempFactor').textContent = result.adjustmentFactors.temperature.toFixed(3);
+            document.getElementById('flowFactor').textContent = result.adjustmentFactors.flowRate.toFixed(3);
+            document.getElementById('moistureFactor').textContent = result.adjustmentFactors.moisture.toFixed(3);
+            document.getElementById('qualityFactor').textContent = result.adjustmentFactors.quality.toFixed(3);
+            
+            // Recommendations
+            const recContainer = document.getElementById('recommendations');
+            recContainer.innerHTML = '';
+            
+            if (result.recommendations.length === 0) {
+                recContainer.innerHTML = '<p style="color: #4caf50; text-align: center;">All parameters are within optimal range!</p>';
+            } else {
+                result.recommendations.forEach(rec => {
+                    const icon = rec.type === 'warning' ? '️' : 
+                                rec.type === 'alert' ? '' : 'ℹ️';
+                    
+                    const recEl = document.createElement('div');
+                    recEl.className = `recommendation ${rec.type}`;
+                    recEl.innerHTML = `
+                        <span class="recommendation-icon">${icon}</span>
+                        <div>${rec.message}</div>
+                    `;
+                    recContainer.appendChild(recEl);
+                });
+            }
+        }
+
+        function displaySimulation(simulation) {
+            document.getElementById('simulation').style.display = 'block';
+            
+            // Performance metrics
+            document.getElementById('predictedYield').textContent = (simulation.predictedYield * 100).toFixed(1) + '%';
+            document.getElementById('proteinRecovery').textContent = (simulation.proteinRecovery * 100).toFixed(1) + '%';
+            document.getElementById('starchPurity').textContent = (simulation.starchPurity * 100).toFixed(2) + '%';
+            document.getElementById('processTime').textContent = simulation.estimatedProcessTime + 'h';
+            
+            // Economic impact
+            document.getElementById('dailyBenefit').textContent = simulation.economicImpact.dailyBenefit.toLocaleString();
+            document.getElementById('annualBenefit').textContent = simulation.economicImpact.annualBenefit.toLocaleString();
+            document.getElementById('yieldImprovement').textContent = simulation.economicImpact.yieldImprovement;
+        }
+
+        // Update monitoring data
+        function updateMonitoring() {
+            const data = optimizer.getMonitoringData();
+            
+            document.getElementById('monSetPoint').textContent = data.currentSetPoint;
+            document.getElementById('monActualPH').textContent = data.actualPH;
+            document.getElementById('monTemp').textContent = data.temperature + '°C';
+            document.getElementById('monFlow').textContent = data.flowRate + ' L/min';
+            document.getElementById('monSteam').textContent = data.steamPressure;
+            document.getElementById('monAgitator').textContent = data.agitatorSpeed;
+            document.getElementById('monTankLevel').textContent = data.tankLevel + '%';
+        }
+
+        // Update monitoring every 5 seconds
+        setInterval(updateMonitoring, 5000);
+        updateMonitoring(); // Initial load
+    </script>
+</body>
+</html>
