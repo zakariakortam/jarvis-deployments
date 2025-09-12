@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>River Raid</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+        #gameContainer {
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #0ff;
+            background: #000;
+        }
+        #gameInfo {
+            color: #0ff;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        #controls {
+            color: #fff;
+            margin-top: 10px;
+        }
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0;
+            font-size: 36px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="gameInfo">
+            <span>SCORE: <span id="score">0</span></span> | 
+            <span>FUEL: <span id="fuel">100</span>%</span> | 
+            <span>LIVES: <span id="lives">3</span></span>
+        </div>
+        <canvas id="gameCanvas" width="600" height="800"></canvas>
+        <div id="controls">
+            Use ARROW KEYS to move | SPACE to shoot | P to pause
+        </div>
+        <div id="gameOver">
+            <div>GAME OVER</div>
+            <div>Final Score: <span id="finalScore">0</span></div>
+            <div>Press ENTER to restart</div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
