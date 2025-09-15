@@ -1,0 +1,6 @@
+{
+  "buildPack": "compose",
+  "compose": {
+    "file": "./docker-compose.yml"
+  }
+}
