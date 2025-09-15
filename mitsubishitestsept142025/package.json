@@ -1,0 +1,21 @@
+{
+  "name": "mitsubishi-manufacturing-support",
+  "version": "1.0.0",
+  "description": "Manufacturing support application for Mitsubishi Electric",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon index.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "test": "jest",
+    "install-deps": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["manufacturing", "maintenance", "mitsubishi", "factory"],
+  "author": "Facilis AI",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "jest": "^29.7.0"
+  }
+}

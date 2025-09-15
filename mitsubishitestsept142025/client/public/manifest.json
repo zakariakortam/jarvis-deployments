@@ -1,0 +1,72 @@
+{
+  "short_name": "MFG Support",
+  "name": "Mitsubishi Manufacturing Support",
+  "description": "Manufacturing support application for equipment maintenance and issue tracking",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable any"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#dc143c",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["productivity", "business"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Scan QR Code",
+      "short_name": "Scan",
+      "description": "Quickly scan equipment QR codes",
+      "url": "/scan",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Report Issue",
+      "short_name": "Report",
+      "description": "Report equipment issues",
+      "url": "/issues?action=create",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance Tasks",
+      "short_name": "Maintenance",
+      "description": "View maintenance tasks",
+      "url": "/maintenance",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
