@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pepper Acid Optimization System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Pepper Acid Optimization System</h1>
+                <div class="system-status">
+                    <span class="status-indicator" id="systemStatus">Online</span>
+                    <div class="emergency-stop" id="emergencyStop">
+                        <button class="emergency-btn">EMERGENCY STOP</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="app-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="parameters">Parameters</button>
+                <button class="nav-tab" data-tab="optimization">Optimization</button>
+                <button class="nav-tab" data-tab="monitoring">Monitoring</button>
+                <button class="nav-tab" data-tab="safety">Safety</button>
+                <button class="nav-tab" data-tab="reports">Reports</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Parameters Tab -->
+            <div class="tab-content active" id="parameters">
+                <div class="content-grid">
+                    <div class="card">
+                        <h2>Process Parameters</h2>
+                        <form id="parametersForm" class="parameters-form">
+                            <div class="form-group">
+                                <label for="pepperType">Pepper Type:</label>
+                                <select id="pepperType" name="pepperType" required>
+                                    <option value="">Select pepper type</option>
+                                    <option value="cayenne">Cayenne</option>
+                                    <option value="habanero">Habanero</option>
+                                    <option value="jalapeño">Jalapeño</option>
+                                    <option value="ghost">Ghost Pepper</option>
+                                    <option value="bell">Bell Pepper</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="moisture">Initial Moisture (%):</label>
+                                    <input type="number" id="moisture" name="moisture" min="0" max="100" step="0.1" required>
+                                    <span class="input-hint">Typical: 80-90%</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="targetMoisture">Target Moisture (%):</label>
+                                    <input type="number" id="targetMoisture" name="targetMoisture" min="0" max="100" step="0.1" required>
+                                    <span class="input-hint">Typical: 8-12%</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="batchSize">Batch Size (kg):</label>
+                                    <input type="number" id="batchSize" name="batchSize" min="1" max="10000" step="0.1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="temperature">Process Temperature (°C):</label>
+                                    <input type="number" id="temperature" name="temperature" min="20" max="100" step="0.1" required>
+                                    <span class="input-hint">Typical: 60-80°C</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="currentPH">Current pH:</label>
+                                    <input type="number" id="currentPH" name="currentPH" min="0" max="14" step="0.01" required>
+                                    <span class="input-hint">Safe range: 3.0-6.0</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="targetPH">Target pH:</label>
+                                    <input type="number" id="targetPH" name="targetPH" min="0" max="14" step="0.01" required>
+                                    <span class="input-hint">Optimal: 3.5-4.5</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="acidType">Acid Type:</label>
+                                <select id="acidType" name="acidType" required>
+                                    <option value="">Select acid type</option>
+                                    <option value="citric">Citric Acid</option>
+                                    <option value="acetic">Acetic Acid</option>
+                                    <option value="lactic">Lactic Acid</option>
+                                    <option value="phosphoric">Phosphoric Acid</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">Update Parameters</button>
+                                <button type="reset" class="btn-secondary">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h2>Current Settings</h2>
+                        <div id="currentSettings" class="settings-display">
+                            <div class="setting-item">
+                                <span class="setting-label">Acid Concentration:</span>
+                                <span class="setting-value" id="currentAcidConc">--</span>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Flow Rate:</span>
+                                <span class="setting-value" id="currentFlowRate">--</span>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Process Time:</span>
+                                <span class="setting-value" id="processTime">--</span>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Status:</span>
+                                <span class="setting-value status" id="processStatus">Idle</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimization Tab -->
+            <div class="tab-content" id="optimization">
+                <div class="content-grid">
+                    <div class="card full-width">
+                        <h2>Optimization Engine</h2>
+                        <div class="optimization-controls">
+                            <div class="control-group">
+                                <label>Optimization Strategy:</label>
+                                <select id="optimizationStrategy">
+                                    <option value="efficiency">Maximum Efficiency</option>
+                                    <option value="quality">Maximum Quality</option>
+                                    <option value="speed">Minimum Time</option>
+                                    <option value="cost">Minimum Cost</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label>Constraints:</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" id="safetyConstraints" checked> Safety Limits</label>
+                                    <label><input type="checkbox" id="qualityConstraints" checked> Quality Standards</label>
+                                    <label><input type="checkbox" id="timeConstraints"> Time Limits</label>
+                                    <label><input type="checkbox" id="costConstraints"> Cost Limits</label>
+                                </div>
+                            </div>
+                            <button id="runOptimization" class="btn-primary large">Run Optimization</button>
+                        </div>
+
+                        <div id="optimizationResults" class="optimization-results">
+                            <h3>Optimization Results</h3>
+                            <div class="results-grid">
+                                <div class="result-item">
+                                    <span class="result-label">Optimal Acid Concentration:</span>
+                                    <span class="result-value" id="optimalConcentration">--</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Recommended Flow Rate:</span>
+                                    <span class="result-value" id="optimalFlowRate">--</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Estimated Process Time:</span>
+                                    <span class="result-value" id="estimatedTime">--</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Quality Score:</span>
+                                    <span class="result-value" id="qualityScore">--</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Efficiency:</span>
+                                    <span class="result-value" id="efficiency">--</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Safety Margin:</span>
+                                    <span class="result-value" id="safetyMargin">--</span>
+                                </div>
+                            </div>
+                            <div class="result-actions">
+                                <button id="applyResults" class="btn-success">Apply Results</button>
+                                <button id="saveResults" class="btn-secondary">Save Results</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring Tab -->
+            <div class="tab-content" id="monitoring">
+                <div class="monitoring-dashboard">
+                    <div class="dashboard-row">
+                        <div class="metric-card">
+                            <h3>pH Level</h3>
+                            <div class="metric-value" id="livePH">4.2</div>
+                            <div class="metric-trend">
+                                <canvas id="phChart" width="200" height="100"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Temperature</h3>
+                            <div class="metric-value" id="liveTemp">72°C</div>
+                            <div class="metric-trend">
+                                <canvas id="tempChart" width="200" height="100"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Acid Flow</h3>
+                            <div class="metric-value" id="liveFlow">2.5 L/min</div>
+                            <div class="metric-trend">
+                                <canvas id="flowChart" width="200" height="100"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Moisture</h3>
+                            <div class="metric-value" id="liveMoisture">45%</div>
+                            <div class="metric-trend">
+                                <canvas id="moistureChart" width="200" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-row">
+                        <div class="chart-container">
+                            <h3>Process Overview</h3>
+                            <canvas id="mainChart" width="800" height="400"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-row">
+                        <div class="alerts-panel">
+                            <h3>Alerts & Notifications</h3>
+                            <div id="alertsList" class="alerts-list">
+                                <div class="alert info">
+                                    <span class="alert-time">10:30:45</span>
+                                    <span class="alert-message">Optimization complete - Ready to apply</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safety Tab -->
+            <div class="tab-content" id="safety">
+                <div class="content-grid">
+                    <div class="card">
+                        <h2>Safety Limits</h2>
+                        <div class="safety-limits">
+                            <div class="limit-item">
+                                <label>Maximum pH:</label>
+                                <input type="number" id="maxPH" value="6.0" min="0" max="14" step="0.1">
+                                <span class="current-status safe">Within Limits</span>
+                            </div>
+                            <div class="limit-item">
+                                <label>Minimum pH:</label>
+                                <input type="number" id="minPH" value="3.0" min="0" max="14" step="0.1">
+                                <span class="current-status safe">Within Limits</span>
+                            </div>
+                            <div class="limit-item">
+                                <label>Maximum Temperature:</label>
+                                <input type="number" id="maxTemp" value="85" min="0" max="200" step="0.1">
+                                <span class="current-status safe">Within Limits</span>
+                            </div>
+                            <div class="limit-item">
+                                <label>Maximum Acid Concentration:</label>
+                                <input type="number" id="maxAcidConc" value="50" min="0" max="100" step="0.1">
+                                <span class="current-status safe">Within Limits</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary">Update Safety Limits</button>
+                    </div>
+
+                    <div class="card">
+                        <h2>Safety Status</h2>
+                        <div class="safety-status">
+                            <div class="status-item safe">
+                                <span class="status-icon">✓</span>
+                                <span class="status-text">pH Levels Normal</span>
+                            </div>
+                            <div class="status-item safe">
+                                <span class="status-icon">✓</span>
+                                <span class="status-text">Temperature Within Range</span>
+                            </div>
+                            <div class="status-item safe">
+                                <span class="status-icon">✓</span>
+                                <span class="status-text">Pressure Normal</span>
+                            </div>
+                            <div class="status-item safe">
+                                <span class="status-icon">✓</span>
+                                <span class="status-text">Flow Rate Stable</span>
+                            </div>
+                        </div>
+
+                        <div class="emergency-procedures">
+                            <h3>Emergency Procedures</h3>
+                            <div class="procedure-buttons">
+                                <button class="btn-emergency">Stop Acid Flow</button>
+                                <button class="btn-emergency">Emergency Drain</button>
+                                <button class="btn-emergency">System Shutdown</button>
+                                <button class="btn-emergency">Alert Supervisor</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-content" id="reports">
+                <div class="content-grid">
+                    <div class="card">
+                        <h2>Process Reports</h2>
+                        <div class="report-controls">
+                            <div class="date-range">
+                                <label>From:</label>
+                                <input type="date" id="reportFromDate">
+                                <label>To:</label>
+                                <input type="date" id="reportToDate">
+                            </div>
+                            <div class="report-type">
+                                <label>Report Type:</label>
+                                <select id="reportType">
+                                    <option value="summary">Process Summary</option>
+                                    <option value="detailed">Detailed Analysis</option>
+                                    <option value="safety">Safety Report</option>
+                                    <option value="quality">Quality Report</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary">Generate Report</button>
+                        </div>
+
+                        <div class="recent-reports">
+                            <h3>Recent Reports</h3>
+                            <div class="report-list">
+                                <div class="report-item">
+                                    <span class="report-name">Daily Process Summary - 2024-01-15</span>
+                                    <span class="report-date">Generated: 2024-01-15 18:30</span>
+                                    <button class="btn-link">Download</button>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-name">Quality Analysis - Week 2</span>
+                                    <span class="report-date">Generated: 2024-01-14 09:15</span>
+                                    <button class="btn-link">Download</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Performance Metrics</h2>
+                        <div class="metrics-summary">
+                            <div class="metric-summary">
+                                <h4>Today's Performance</h4>
+                                <div class="summary-stats">
+                                    <div class="stat">
+                                        <span class="stat-label">Batches Processed:</span>
+                                        <span class="stat-value">12</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Average Quality Score:</span>
+                                        <span class="stat-value">94.2%</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Efficiency:</span>
+                                        <span class="stat-value">87.5%</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Safety Incidents:</span>
+                                        <span class="stat-value">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/models/DataModels.js"></script>
+    <script src="js/validation/SafetyValidator.js"></script>
+    <script src="js/optimization/OptimizationEngine.js"></script>
+    <script src="js/monitoring/MonitoringSystem.js"></script>
+    <script src="js/ui/Dashboard.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
