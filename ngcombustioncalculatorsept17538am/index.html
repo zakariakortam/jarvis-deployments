@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Natural Gas Combustion Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Natural Gas Combustion Thermodynamics Calculator</h1>
+            <p>Industry-Grade Engineering Calculations</p>
+        </header>
+
+        <nav class="tab-nav">
+            <button class="tab-button active" data-tab="combustion">Combustion Analysis</button>
+            <button class="tab-button" data-tab="properties">Gas Properties</button>
+            <button class="tab-button" data-tab="heat-transfer">Heat Transfer</button>
+            <button class="tab-button" data-tab="emissions">Emissions</button>
+            <button class="tab-button" data-tab="flow">Flow Analysis</button>
+        </nav>
+
+        <main>
+            <!-- Combustion Analysis Tab -->
+            <div id="combustion" class="tab-content active">
+                <h2>Combustion Stoichiometry & Flame Temperature</h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <h3>Fuel Composition (%)</h3>
+                        <label>Methane (CH₄): <input type="number" id="ch4" value="95.0" step="0.1" min="0" max="100"></label>
+                        <label>Ethane (C₂H₆): <input type="number" id="c2h6" value="3.0" step="0.1" min="0" max="100"></label>
+                        <label>Propane (C₃H₈): <input type="number" id="c3h8" value="1.0" step="0.1" min="0" max="100"></label>
+                        <label>Nitrogen (N₂): <input type="number" id="n2_fuel" value="1.0" step="0.1" min="0" max="100"></label>
+                        <div class="total-display">Total: <span id="fuel-total">100.0</span>%</div>
+                    </div>
+
+                    <div class="input-group">
+                        <h3>Operating Conditions</h3>
+                        <label>Air Temperature (°C): <input type="number" id="air-temp" value="25" step="1"></label>
+                        <label>Fuel Temperature (°C): <input type="number" id="fuel-temp" value="25" step="1"></label>
+                        <label>Pressure (bar): <input type="number" id="pressure" value="1.013" step="0.001"></label>
+                        <label>Excess Air (%): <input type="number" id="excess-air" value="10" step="1" min="0"></label>
+                        <label>Fuel Flow Rate (Nm³/h): <input type="number" id="fuel-flow" value="1000" step="10"></label>
+                    </div>
+
+                    <div class="input-group">
+                        <h3>Heat Transfer</h3>
+                        <label>Heat Loss (%): <input type="number" id="heat-loss" value="5" step="0.1" min="0" max="50"></label>
+                        <label>Combustion Efficiency (%): <input type="number" id="efficiency" value="85" step="0.1" min="50" max="100"></label>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateCombustion()">Calculate</button>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Stoichiometric Analysis</h3>
+                        <div id="stoich-results">
+                            <p>Stoichiometric Air Ratio: <span id="air-ratio">-</span></p>
+                            <p>Actual Air Flow: <span id="air-flow">-</span> Nm³/h</p>
+                            <p>Fuel/Air Mass Ratio: <span id="fa-ratio">-</span></p>
+                            <p>LHV (kJ/Nm³): <span id="lhv">-</span></p>
+                            <p>HHV (kJ/Nm³): <span id="hhv">-</span></p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Flame Temperature</h3>
+                        <div id="temp-results">
+                            <p>Adiabatic Flame Temp: <span id="adiabatic-temp">-</span> °C</p>
+                            <p>Actual Flame Temp: <span id="actual-temp">-</span> °C</p>
+                            <p>Flue Gas Temp: <span id="flue-temp">-</span> °C</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Product Composition</h3>
+                        <div id="products-results">
+                            <p>CO₂: <span id="co2-dry">-</span> % (dry)</p>
+                            <p>H₂O: <span id="h2o">-</span> % (wet)</p>
+                            <p>O₂: <span id="o2">-</span> % (dry)</p>
+                            <p>N₂: <span id="n2">-</span> % (dry)</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Energy Balance</h3>
+                        <div id="energy-results">
+                            <p>Heat Input: <span id="heat-input">-</span> kW</p>
+                            <p>Heat Output: <span id="heat-output">-</span> kW</p>
+                            <p>Heat to Products: <span id="heat-products">-</span> kW</p>
+                            <p>Heat Losses: <span id="heat-losses">-</span> kW</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gas Properties Tab -->
+            <div id="properties" class="tab-content">
+                <h2>Thermodynamic Properties</h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <h3>Gas Selection</h3>
+                        <label>Gas Type: 
+                            <select id="gas-type">
+                                <option value="methane">Methane (CH₄)</option>
+                                <option value="ethane">Ethane (C₂H₆)</option>
+                                <option value="propane">Propane (C₃H₈)</option>
+                                <option value="air">Air</option>
+                                <option value="co2">Carbon Dioxide (CO₂)</option>
+                                <option value="h2o">Water Vapor (H₂O)</option>
+                                <option value="n2">Nitrogen (N₂)</option>
+                                <option value="o2">Oxygen (O₂)</option>
+                            </select>
+                        </label>
+                        <label>Temperature (°C): <input type="number" id="prop-temp" value="25" step="1"></label>
+                        <label>Pressure (bar): <input type="number" id="prop-pressure" value="1.013" step="0.001"></label>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateProperties()">Calculate Properties</button>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Physical Properties</h3>
+                        <div id="physical-props">
+                            <p>Density: <span id="density">-</span> kg/m³</p>
+                            <p>Molecular Weight: <span id="mol-weight">-</span> kg/kmol</p>
+                            <p>Viscosity: <span id="viscosity">-</span> μPa·s</p>
+                            <p>Thermal Conductivity: <span id="conductivity">-</span> W/m·K</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Thermodynamic Properties</h3>
+                        <div id="thermo-props">
+                            <p>Cp: <span id="cp">-</span> kJ/kg·K</p>
+                            <p>Cv: <span id="cv">-</span> kJ/kg·K</p>
+                            <p>γ (Cp/Cv): <span id="gamma">-</span></p>
+                            <p>Enthalpy: <span id="enthalpy">-</span> kJ/kg</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Heat Transfer Tab -->
+            <div id="heat-transfer" class="tab-content">
+                <h2>Heat Transfer Analysis</h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <h3>Furnace Geometry</h3>
+                        <label>Length (m): <input type="number" id="length" value="5.0" step="0.1"></label>
+                        <label>Width (m): <input type="number" id="width" value="3.0" step="0.1"></label>
+                        <label>Height (m): <input type="number" id="height" value="2.0" step="0.1"></label>
+                        <label>Wall Thickness (mm): <input type="number" id="wall-thickness" value="200" step="10"></label>
+                    </div>
+
+                    <div class="input-group">
+                        <h3>Wall Properties</h3>
+                        <label>Wall Material:
+                            <select id="wall-material">
+                                <option value="refractory">Refractory Brick</option>
+                                <option value="steel">Steel</option>
+                                <option value="insulation">Insulation</option>
+                            </select>
+                        </label>
+                        <label>Inner Surface Temp (°C): <input type="number" id="inner-temp" value="1200" step="10"></label>
+                        <label>Outer Surface Temp (°C): <input type="number" id="outer-temp" value="50" step="1"></label>
+                        <label>Emissivity: <input type="number" id="emissivity" value="0.8" step="0.01" min="0" max="1"></label>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateHeatTransfer()">Calculate Heat Transfer</button>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Heat Transfer Rates</h3>
+                        <div id="heat-transfer-results">
+                            <p>Conduction: <span id="conduction">-</span> kW</p>
+                            <p>Convection: <span id="convection">-</span> kW</p>
+                            <p>Radiation: <span id="radiation">-</span> kW</p>
+                            <p>Total Heat Loss: <span id="total-loss">-</span> kW</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Heat Transfer Coefficients</h3>
+                        <div id="ht-coefficients">
+                            <p>Overall U: <span id="u-overall">-</span> W/m²·K</p>
+                            <p>Convective h: <span id="h-conv">-</span> W/m²·K</p>
+                            <p>Radiative h: <span id="h-rad">-</span> W/m²·K</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emissions Tab -->
+            <div id="emissions" class="tab-content">
+                <h2>Emissions Analysis</h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <h3>Emission Parameters</h3>
+                        <label>Peak Flame Temp (°C): <input type="number" id="peak-temp" value="1800" step="10"></label>
+                        <label>Residence Time (s): <input type="number" id="residence-time" value="0.5" step="0.01"></label>
+                        <label>Mixing Quality (1-10): <input type="number" id="mixing" value="7" step="1" min="1" max="10"></label>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateEmissions()">Calculate Emissions</button>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>NOx Emissions</h3>
+                        <div id="nox-results">
+                            <p>Thermal NOx: <span id="thermal-nox">-</span> mg/Nm³</p>
+                            <p>Prompt NOx: <span id="prompt-nox">-</span> mg/Nm³</p>
+                            <p>Total NOx: <span id="total-nox">-</span> mg/Nm³</p>
+                            <p>NOx (ppm): <span id="nox-ppm">-</span> ppm</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Other Emissions</h3>
+                        <div id="other-emissions">
+                            <p>CO: <span id="co-emission">-</span> mg/Nm³</p>
+                            <p>CO₂: <span id="co2-emission">-</span> kg/h</p>
+                            <p>Unburned HC: <span id="hc-emission">-</span> mg/Nm³</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flow Analysis Tab -->
+            <div id="flow" class="tab-content">
+                <h2>Flow & Pressure Analysis</h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <h3>Pipe Parameters</h3>
+                        <label>Pipe Diameter (mm): <input type="number" id="pipe-diameter" value="100" step="1"></label>
+                        <label>Pipe Length (m): <input type="number" id="pipe-length" value="10" step="0.1"></label>
+                        <label>Pipe Roughness (μm): <input type="number" id="roughness" value="45" step="1"></label>
+                        <label>Flow Velocity (m/s): <input type="number" id="velocity" value="10" step="0.1"></label>
+                    </div>
+
+                    <div class="input-group">
+                        <h3>Fittings & Accessories</h3>
+                        <label>90° Elbows: <input type="number" id="elbows" value="2" step="1" min="0"></label>
+                        <label>Tee Junctions: <input type="number" id="tees" value="1" step="1" min="0"></label>
+                        <label>Gate Valves: <input type="number" id="valves" value="1" step="1" min="0"></label>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateFlow()">Calculate Flow</button>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Flow Characteristics</h3>
+                        <div id="flow-results">
+                            <p>Reynolds Number: <span id="reynolds">-</span></p>
+                            <p>Friction Factor: <span id="friction-factor">-</span></p>
+                            <p>Mass Flow Rate: <span id="mass-flow">-</span> kg/s</p>
+                            <p>Volume Flow Rate: <span id="vol-flow">-</span> m³/s</p>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Pressure Drops</h3>
+                        <div id="pressure-results">
+                            <p>Friction Loss: <span id="friction-loss">-</span> Pa</p>
+                            <p>Minor Losses: <span id="minor-losses">-</span> Pa</p>
+                            <p>Total Pressure Drop: <span id="total-pressure-drop">-</span> Pa</p>
+                            <p>Required Pressure: <span id="required-pressure">-</span> bar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button class="export-btn" onclick="exportResults()">Export Results</button>
+            <p>&copy; 2024 Industrial Thermodynamics Calculator</p>
+        </footer>
+    </div>
+
+    <script src="thermodynamics.js"></script>
+    <script src="calculations.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
