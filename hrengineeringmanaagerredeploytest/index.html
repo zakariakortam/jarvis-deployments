@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Team HR Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-users-cog"></i>
+                <span>HR Engineering Manager</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('dashboard')" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('employees')" class="nav-link">Employees</a></li>
+                <li><a href="#" onclick="showSection('performance')" class="nav-link">Performance</a></li>
+                <li><a href="#" onclick="showSection('timeoff')" class="nav-link">Time Off</a></li>
+                <li><a href="#" onclick="showSection('projects')" class="nav-link">Projects</a></li>
+                <li><a href="#" onclick="showSection('analytics')" class="nav-link">Analytics</a></li>
+            </ul>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h1><i class="fas fa-tachometer-alt"></i> Team Dashboard</h1>
+                <button class="btn-primary" onclick="showAddEmployeeModal()">
+                    <i class="fas fa-plus"></i> Add Employee
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalEmployees">0</h3>
+                        <p>Total Engineers</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="stat-info">
+                        <h3 id="activeProjects">0</h3>
+                        <p>Active Projects</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-times"></i></div>
+                    <div class="stat-info">
+                        <h3 id="pendingTimeOff">0</h3>
+                        <p>Pending Time Off</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    <div class="stat-info">
+                        <h3 id="avgPerformance">0.0</h3>
+                        <p>Avg Performance</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="recent-activities">
+                    <h3>Recent Activities</h3>
+                    <ul id="activityList">
+                        <li>Welcome to your HR Engineering Manager!</li>
+                    </ul>
+                </div>
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="showAddEmployeeModal()">
+                            <i class="fas fa-user-plus"></i> Add Engineer
+                        </button>
+                        <button class="action-btn" onclick="showSection('performance')">
+                            <i class="fas fa-chart-line"></i> Review Performance
+                        </button>
+                        <button class="action-btn" onclick="showSection('timeoff')">
+                            <i class="fas fa-calendar"></i> Manage Time Off
+                        </button>
+                        <button class="action-btn" onclick="generateReport()">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Employees Section -->
+        <section id="employees" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-users"></i> Team Members</h1>
+                <div class="header-actions">
+                    <input type="text" id="employeeSearch" placeholder="Search employees..." onkeyup="searchEmployees()">
+                    <select id="departmentFilter" onchange="filterEmployees()">
+                        <option value="">All Departments</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="QA">QA</option>
+                    </select>
+                    <button class="btn-primary" onclick="showAddEmployeeModal()">
+                        <i class="fas fa-plus"></i> Add Employee
+                    </button>
+                </div>
+            </div>
+
+            <div class="employees-grid" id="employeesGrid">
+                <!-- Employee cards will be dynamically generated here -->
+            </div>
+        </section>
+
+        <!-- Performance Section -->
+        <section id="performance" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-line"></i> Performance Management</h1>
+                <button class="btn-primary" onclick="showPerformanceReviewModal()">
+                    <i class="fas fa-plus"></i> New Review
+                </button>
+            </div>
+
+            <div class="performance-overview">
+                <div class="performance-stats">
+                    <div class="perf-stat">
+                        <h3>Team Average</h3>
+                        <div class="rating-display" id="teamAvgRating">4.2</div>
+                    </div>
+                    <div class="perf-stat">
+                        <h3>Reviews This Quarter</h3>
+                        <div class="number-display" id="reviewsThisQuarter">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="performance-table-container">
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Last Review</th>
+                            <th>Overall Rating</th>
+                            <th>Technical Skills</th>
+                            <th>Communication</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="performanceTableBody">
+                        <!-- Performance data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Time Off Section -->
+        <section id="timeoff" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-calendar-times"></i> Time Off Management</h1>
+                <button class="btn-primary" onclick="showTimeOffModal()">
+                    <i class="fas fa-plus"></i> Request Time Off
+                </button>
+            </div>
+
+            <div class="timeoff-tabs">
+                <button class="tab-btn active" onclick="showTimeOffTab('pending')">Pending Requests</button>
+                <button class="tab-btn" onclick="showTimeOffTab('approved')">Approved</button>
+                <button class="tab-btn" onclick="showTimeOffTab('calendar')">Team Calendar</button>
+            </div>
+
+            <div id="timeOffContent">
+                <div class="timeoff-requests" id="pendingRequests">
+                    <!-- Pending requests will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-project-diagram"></i> Project Management</h1>
+                <button class="btn-primary" onclick="showProjectModal()">
+                    <i class="fas fa-plus"></i> New Project
+                </button>
+            </div>
+
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Projects will be populated here -->
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-bar"></i> Analytics & Reports</h1>
+                <button class="btn-primary" onclick="exportReport()">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+            </div>
+
+            <div class="analytics-dashboard">
+                <div class="chart-container">
+                    <h3>Team Performance Trends</h3>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Department Distribution</h3>
+                    <canvas id="departmentChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Time Off Usage</h3>
+                    <canvas id="timeOffChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Project Completion Rate</h3>
+                    <canvas id="projectChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modals -->
+    <div id="addEmployeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Employee</h2>
+                <span class="close" onclick="closeModal('addEmployeeModal')">&times;</span>
+            </div>
+            <form id="employeeForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="department" required>
+                            <option value="">Select Department</option>
+                            <option value="Frontend">Frontend</option>
+                            <option value="Backend">Backend</option>
+                            <option value="DevOps">DevOps</option>
+                            <option value="Mobile">Mobile</option>
+                            <option value="QA">QA</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <input type="text" id="position" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Salary</label>
+                        <input type="number" id="salary" min="0" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label>Skills (comma separated)</label>
+                        <input type="text" id="skills" placeholder="JavaScript, React, Node.js">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('addEmployeeModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="performanceReviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Performance Review</h2>
+                <span class="close" onclick="closeModal('performanceReviewModal')">&times;</span>
+            </div>
+            <form id="performanceForm">
+                <div class="form-group">
+                    <label>Employee</label>
+                    <select id="reviewEmployee" required>
+                        <option value="">Select Employee</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Review Period</label>
+                    <input type="text" id="reviewPeriod" placeholder="Q1 2024" required>
+                </div>
+                <div class="rating-grid">
+                    <div class="rating-group">
+                        <label>Technical Skills</label>
+                        <div class="rating-stars" data-rating="technical">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
+                    </div>
+                    <div class="rating-group">
+                        <label>Communication</label>
+                        <div class="rating-stars" data-rating="communication">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
+                    </div>
+                    <div class="rating-group">
+                        <label>Problem Solving</label>
+                        <div class="rating-stars" data-rating="problemSolving">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
+                    </div>
+                    <div class="rating-group">
+                        <label>Teamwork</label>
+                        <div class="rating-stars" data-rating="teamwork">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Comments</label>
+                    <textarea id="reviewComments" rows="4" placeholder="Performance review comments..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Goals for Next Period</label>
+                    <textarea id="reviewGoals" rows="3" placeholder="Goals and objectives..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('performanceReviewModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="timeOffModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Time Off Request</h2>
+                <span class="close" onclick="closeModal('timeOffModal')">&times;</span>
+            </div>
+            <form id="timeOffForm">
+                <div class="form-group">
+                    <label>Employee</label>
+                    <select id="timeOffEmployee" required>
+                        <option value="">Select Employee</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Request Type</label>
+                    <select id="timeOffType" required>
+                        <option value="">Select Type</option>
+                        <option value="Vacation">Vacation</option>
+                        <option value="Sick Leave">Sick Leave</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Maternity/Paternity">Maternity/Paternity</option>
+                    </select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="timeOffStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="timeOffEndDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <textarea id="timeOffReason" rows="3" placeholder="Reason for time off..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('timeOffModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Project</h2>
+                <span class="close" onclick="closeModal('projectModal')">&times;</span>
+            </div>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="projectDescription" rows="3" placeholder="Project description..."></textarea>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="projectStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="projectEndDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Assigned Team Members</label>
+                    <div id="projectTeamMembers" class="checkbox-group">
+                        <!-- Team member checkboxes will be populated here -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="projectPriority" required>
+                        <option value="">Select Priority</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
