@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watermelon Acid Set Point Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2E8B57, #32CD32);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #2E8B57;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #2E8B57;
+        }
+        
+        .unit {
+            font-size: 0.9em;
+            color: #666;
+            margin-left: 5px;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #2E8B57, #32CD32);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 139, 87, 0.3);
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #ff6b35;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2E8B57;
+            margin-bottom: 5px;
+        }
+        
+        .result-label {
+            font-size: 1.1em;
+            color: #666;
+        }
+        
+        .optimization-chart {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .recommendations {
+            grid-column: 1 / -1;
+            background: #e8f5e8;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 5px solid #32CD32;
+        }
+        
+        .recommendations h3 {
+            color: #2E8B57;
+            margin-bottom: 15px;
+        }
+        
+        .recommendation-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #32CD32;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍉 Watermelon Acid Set Point Optimizer</h1>
+            <p>Advanced Agricultural Process Optimization for Dry Thinning</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h3>Process Parameters</h3>
+                
+                <div class="input-group">
+                    <label for="temperature">Temperature <span class="unit">(°C)</span></label>
+                    <input type="number" id="temperature" value="25" min="15" max="40" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="humidity">Relative Humidity <span class="unit">(%)</span></label>
+                    <input type="number" id="humidity" value="65" min="30" max="95" step="1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="fruitSize">Average Fruit Size <span class="unit">(cm diameter)</span></label>
+                    <input type="number" id="fruitSize" value="8.5" min="5" max="15" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="maturity">Fruit Maturity <span class="unit">(days after pollination)</span></label>
+                    <input type="number" id="maturity" value="25" min="15" max="40" step="1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="density">Fruit Density <span class="unit">(fruits per m²)</span></label>
+                    <input type="number" id="density" value="3.2" min="1" max="10" step="0.1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="targetThinning">Target Thinning Rate <span class="unit">(%)</span></label>
+                    <input type="number" id="targetThinning" value="30" min="10" max="60" step="5">
+                </div>
+                
+                <button class="calculate-btn" onclick="optimizeAcidSetPoint()">
+                    🔬 Optimize Acid Set Point
+                </button>
+            </div>
+            
+            <div class="results-section">
+                <h3>Optimization Results</h3>
+                
+                <div class="result-item">
+                    <div class="result-value" id="optimalPH">--</div>
+                    <div class="result-label">Optimal pH Level</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-value" id="acidConcentration">--</div>
+                    <div class="result-label">Acid Concentration (ppm)</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-value" id="applicationRate">--</div>
+                    <div class="result-label">Application Rate (L/ha)</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-value" id="efficiency">--</div>
+                    <div class="result-label">Predicted Efficiency (%)</div>
+                </div>
+                
+                <canvas class="optimization-chart" id="optimizationChart"></canvas>
+            </div>
+            
+            <div class="recommendations">
+                <h3>🎯 Optimization Recommendations</h3>
+                <div id="recommendationsList">
+                    <div class="recommendation-item">
+                        Enter your process parameters and click "Optimize Acid Set Point" to get personalized recommendations.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function optimizeAcidSetPoint() {
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const humidity = parseFloat(document.getElementById('humidity').value);
+            const fruitSize = parseFloat(document.getElementById('fruitSize').value);
+            const maturity = parseFloat(document.getElementById('maturity').value);
+            const density = parseFloat(document.getElementById('density').value);
+            const targetThinning = parseFloat(document.getElementById('targetThinning').value);
+            
+            // Advanced optimization algorithm for watermelon acid set point
+            const optimalPH = calculateOptimalPH(temperature, humidity, fruitSize, maturity, targetThinning);
+            const acidConcentration = calculateAcidConcentration(optimalPH, temperature, density);
+            const applicationRate = calculateApplicationRate(acidConcentration, density, targetThinning);
+            const efficiency = calculateEfficiency(temperature, humidity, maturity, optimalPH);
+            
+            // Update results display
+            document.getElementById('optimalPH').textContent = optimalPH.toFixed(2);
+            document.getElementById('acidConcentration').textContent = acidConcentration.toFixed(0);
+            document.getElementById('applicationRate').textContent = applicationRate.toFixed(1);
+            document.getElementById('efficiency').textContent = efficiency.toFixed(1) + '%';
+            
+            // Generate recommendations
+            generateRecommendations(temperature, humidity, fruitSize, maturity, density, targetThinning, optimalPH, efficiency);
+            
+            // Draw optimization chart
+            drawOptimizationChart(optimalPH, acidConcentration, efficiency);
+        }
+        
+        function calculateOptimalPH(temp, humidity, size, maturity, thinning) {
+            // Advanced pH optimization based on environmental and fruit factors
+            let basePH = 3.8;
+            
+            // Temperature adjustment
+            basePH += (temp - 25) * 0.02;
+            
+            // Humidity adjustment
+            basePH += (humidity - 65) * 0.005;
+            
+            // Fruit size adjustment
+            basePH += (size - 8.5) * 0.03;
+            
+            // Maturity adjustment
+            basePH += (maturity - 25) * 0.01;
+            
+            // Target thinning adjustment
+            basePH += (thinning - 30) * 0.008;
+            
+            return Math.max(3.2, Math.min(4.5, basePH));
+        }
+        
+        function calculateAcidConcentration(pH, temp, density) {
+            // Calculate required acid concentration based on pH and conditions
+            const baseConcentration = Math.pow(10, -pH) * 1000000; // Convert to ppm
+            const tempFactor = 1 + (temp - 25) * 0.02;
+            const densityFactor = 1 + (density - 3.2) * 0.1;
+            
+            return baseConcentration * tempFactor * densityFactor * 15;
+        }
+        
+        function calculateApplicationRate(concentration, density, thinning) {
+            // Calculate application rate in L/ha
+            const baseRate = 250;
+            const concentrationFactor = concentration / 1000;
+            const densityFactor = density / 3.2;
+            const thinningFactor = thinning / 30;
+            
+            return baseRate * concentrationFactor * densityFactor * thinningFactor;
+        }
+        
+        function calculateEfficiency(temp, humidity, maturity, pH) {
+            // Calculate predicted thinning efficiency
+            let efficiency = 75;
+            
+            // Temperature optimization curve
+            const tempOptimal = 28;
+            efficiency -= Math.abs(temp - tempOptimal) * 1.5;
+            
+            // Humidity optimization
+            const humidityOptimal = 70;
+            efficiency -= Math.abs(humidity - humidityOptimal) * 0.3;
+            
+            // Maturity factor
+            efficiency += (maturity - 20) * 0.8;
+            
+            // pH optimization
+            const pHOptimal = 3.9;
+            efficiency -= Math.abs(pH - pHOptimal) * 8;
+            
+            return Math.max(45, Math.min(95, efficiency));
+        }
+        
+        function generateRecommendations(temp, humidity, size, maturity, density, thinning, pH, efficiency) {
+            const recommendations = [];
+            
+            if (temp < 22) {
+                recommendations.push("🌡️ Consider warming conditions - low temperature may reduce acid effectiveness");
+            } else if (temp > 32) {
+                recommendations.push("❄️ High temperature detected - consider early morning application to avoid heat stress");
+            }
+            
+            if (humidity < 50) {
+                recommendations.push("💧 Low humidity may require increased application rate for better coverage");
+            } else if (humidity > 85) {
+                recommendations.push("🌫️ High humidity - ensure good air circulation to prevent fungal issues");
+            }
+            
+            if (maturity < 20) {
+                recommendations.push("🍼 Fruits are young - use lower concentration to prevent damage");
+            } else if (maturity > 35) {
+                recommendations.push("🍃 Mature fruits - may require higher concentration for effective thinning");
+            }
+            
+            if (density > 5) {
+                recommendations.push("🎯 High fruit density - excellent candidate for chemical thinning");
+            }
+            
+            if (efficiency > 85) {
+                recommendations.push("✅ Excellent conditions for acid thinning - proceed with confidence");
+            } else if (efficiency < 65) {
+                recommendations.push("⚠️ Suboptimal conditions - consider adjusting parameters or timing");
+            }
+            
+            recommendations.push(`🔬 Apply at pH ${pH.toFixed(2)} for optimal penetration and selectivity`);
+            recommendations.push("📅 Best application time: Early morning (6-9 AM) on calm, dry days");
+            recommendations.push("🛡️ Always use appropriate PPE and follow safety protocols");
+            
+            const listElement = document.getElementById('recommendationsList');
+            listElement.innerHTML = recommendations.map(rec => 
+                `<div class="recommendation-item">${rec}</div>`
+            ).join('');
+        }
+        
+        function drawOptimizationChart(pH, concentration, efficiency) {
+            const canvas = document.getElementById('optimizationChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw pH optimization curve
+            ctx.strokeStyle = '#2E8B57';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let x = 0; x < canvas.width; x++) {
+                const pHValue = 3.0 + (x / canvas.width) * 2.0; // pH range 3.0 to 5.0
+                const efficiency = Math.max(0, 100 - Math.pow((pHValue - pH) * 25, 2));
+                const y = canvas.height - (efficiency / 100 * canvas.height);
+                
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            
+            // Mark optimal point
+            const optimalX = ((pH - 3.0) / 2.0) * canvas.width;
+            const optimalY = canvas.height - (efficiency / 100 * canvas.height);
+            
+            ctx.fillStyle = '#ff6b35';
+            ctx.beginPath();
+            ctx.arc(optimalX, optimalY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add labels
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('pH Range: 3.0 - 5.0', 10, 20);
+            ctx.fillText('Efficiency (%)', 10, canvas.height - 10);
+            ctx.fillText(`Optimal: pH ${pH.toFixed(2)}`, optimalX - 40, optimalY - 15);
+        }
+        
+        // Initialize with default calculation
+        window.addEventListener('load', function() {
+            optimizeAcidSetPoint();
+        });
+    </script>
+</body>
+</html>
