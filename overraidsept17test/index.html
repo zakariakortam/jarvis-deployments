@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Over Raid - Elite Space Combat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="startMenu" class="menu">
+            <h1>OVER RAID</h1>
+            <p class="subtitle">Elite Space Combat</p>
+            <button id="startBtn" class="btn-primary">START MISSION</button>
+            <button id="instructionsBtn" class="btn-secondary">INSTRUCTIONS</button>
+            <div class="controls-info">
+                <p>WASD/Arrow Keys - Move | Space - Shoot | P - Pause</p>
+            </div>
+        </div>
+
+        <div id="instructions" class="menu" style="display: none;">
+            <h2>MISSION BRIEFING</h2>
+            <div class="instructions-content">
+                <p><strong>Objective:</strong> Defend Earth from the alien invasion!</p>
+                <p><strong>Controls:</strong></p>
+                <ul>
+                    <li>WASD or Arrow Keys - Navigate your fighter</li>
+                    <li>SPACE - Fire primary weapons</li>
+                    <li>P - Pause/Resume mission</li>
+                </ul>
+                <p><strong>Power-ups:</strong></p>
+                <ul>
+                    <li>🔴 Shield Boost - Restore armor</li>
+                    <li>🟡 Rapid Fire - Increase fire rate</li>
+                    <li>🔵 Multi-Shot - Triple bullet spread</li>
+                    <li>🟢 Score Multiplier - Double points</li>
+                </ul>
+                <p><strong>Survive waves of enemies and achieve the highest score!</strong></p>
+            </div>
+            <button id="backBtn" class="btn-secondary">BACK</button>
+        </div>
+
+        <div id="gameUI" style="display: none;">
+            <div class="hud">
+                <div class="stat">Score: <span id="score">0</span></div>
+                <div class="stat">Wave: <span id="wave">1</span></div>
+                <div class="stat">Lives: <span id="lives">3</span></div>
+                <div class="health-bar">
+                    <div class="health-fill" id="healthFill"></div>
+                </div>
+                <div class="stat" id="powerupDisplay"></div>
+            </div>
+            <canvas id="gameCanvas"></canvas>
+            <div id="pauseMenu" class="overlay" style="display: none;">
+                <div class="pause-content">
+                    <h2>MISSION PAUSED</h2>
+                    <button id="resumeBtn" class="btn-primary">RESUME</button>
+                    <button id="menuBtn" class="btn-secondary">MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="gameOver" class="menu" style="display: none;">
+            <h2>MISSION COMPLETE</h2>
+            <div id="finalScore">Final Score: 0</div>
+            <div id="finalWave">Waves Survived: 0</div>
+            <button id="playAgainBtn" class="btn-primary">RETRY MISSION</button>
+            <button id="mainMenuBtn" class="btn-secondary">MAIN MENU</button>
+        </div>
+
+        <div id="mobileControls" class="mobile-only">
+            <div class="control-pad">
+                <button class="control-btn" id="moveLeft">←</button>
+                <button class="control-btn" id="moveUp">↑</button>
+                <button class="control-btn" id="moveDown">↓</button>
+                <button class="control-btn" id="moveRight">→</button>
+            </div>
+            <button class="shoot-btn" id="shootBtn">FIRE</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
