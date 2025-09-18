@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cucumber Acid Set Point Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2e8b57, #90ee90);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2e8b57;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .results-panel {
+            background: #f0f8f0;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #d4edda;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2e8b57;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2e8b57;
+            cursor: pointer;
+        }
+
+        .value-display {
+            background: white;
+            border: 2px solid #2e8b57;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: bold;
+            text-align: center;
+            color: #2e8b57;
+        }
+
+        .optimize-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #2e8b57, #32cd32);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+
+        .optimize-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2e8b57;
+        }
+
+        .result-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2e8b57;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #32cd32;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2e8b57, #32cd32);
+            transition: width 0.5s ease;
+        }
+
+        .recommendation {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .recommendation h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥒 Cucumber Acid Set Point Optimizer</h1>
+        
+        <div class="main-grid">
+            <div class="control-panel">
+                <h2 style="color: #2e8b57; margin-bottom: 20px;">Control Parameters</h2>
+                
+                <div class="control-group">
+                    <label for="ph-range">pH Level</label>
+                    <input type="range" id="ph-range" min="3.0" max="7.0" step="0.1" value="4.5">
+                    <div class="value-display" id="ph-value">4.5</div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="temp-range">Temperature (°C)</label>
+                    <input type="range" id="temp-range" min="15" max="35" step="1" value="25">
+                    <div class="value-display" id="temp-value">25°C</div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="time-range">Processing Time (hours)</label>
+                    <input type="range" id="time-range" min="1" max="24" step="0.5" value="8">
+                    <div class="value-display" id="time-value">8 hours</div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="cucumber-size">Cucumber Size</label>
+                    <input type="range" id="cucumber-size" min="50" max="200" step="10" value="120">
+                    <div class="value-display" id="size-value">120g</div>
+                </div>
+                
+                <button class="optimize-btn" onclick="optimizeAcidSetPoint()">
+                    🧪 Optimize Acid Set Point
+                </button>
+            </div>
+            
+            <div class="results-panel">
+                <h2 style="color: #2e8b57; margin-bottom: 20px;">Optimization Results</h2>
+                
+                <div class="result-card">
+                    <div class="result-title">Optimal Acid Set Point</div>
+                    <div class="result-value" id="optimal-acid">-- pH</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="acid-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">Efficiency Score</div>
+                    <div class="result-value" id="efficiency-score">--%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="efficiency-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-title">Processing Quality</div>
+                    <div class="result-value" id="quality-score">--</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quality-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 style="color: #2e8b57; margin-bottom: 15px;">Acid Level Curve</h3>
+                    <canvas id="acidChart" width="300" height="200"></canvas>
+                </div>
+                
+                <div class="recommendation" id="recommendation" style="display: none;">
+                    <h3>💡 Optimization Recommendations</h3>
+                    <p id="recommendation-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update display values when sliders change
+        document.getElementById('ph-range').oninput = function() {
+            document.getElementById('ph-value').textContent = this.value;
+        };
+        
+        document.getElementById('temp-range').oninput = function() {
+            document.getElementById('temp-value').textContent = this.value + '°C';
+        };
+        
+        document.getElementById('time-range').oninput = function() {
+            document.getElementById('time-value').textContent = this.value + ' hours';
+        };
+        
+        document.getElementById('cucumber-size').oninput = function() {
+            document.getElementById('size-value').textContent = this.value + 'g';
+        };
+
+        function optimizeAcidSetPoint() {
+            const ph = parseFloat(document.getElementById('ph-range').value);
+            const temp = parseInt(document.getElementById('temp-range').value);
+            const time = parseFloat(document.getElementById('time-range').value);
+            const size = parseInt(document.getElementById('cucumber-size').value);
+            
+            // Complex optimization algorithm for cucumber acid set point
+            const optimalPh = calculateOptimalPh(ph, temp, time, size);
+            const efficiency = calculateEfficiency(ph, temp, time, size);
+            const quality = calculateQuality(ph, temp, time, size, optimalPh);
+            
+            // Update results with animation
+            animateResult('optimal-acid', optimalPh.toFixed(2) + ' pH');
+            animateResult('efficiency-score', efficiency.toFixed(1) + '%');
+            animateResult('quality-score', getQualityGrade(quality));
+            
+            // Update progress bars
+            updateProgressBar('acid-progress', (optimalPh - 3) / 4 * 100);
+            updateProgressBar('efficiency-progress', efficiency);
+            updateProgressBar('quality-progress', quality);
+            
+            // Generate recommendations
+            generateRecommendations(ph, temp, time, size, optimalPh, efficiency, quality);
+            
+            // Draw acid level curve
+            drawAcidCurve(ph, temp, time, optimalPh);
+        }
+
+        function calculateOptimalPh(currentPh, temp, time, size) {
+            // Advanced algorithm considering multiple factors
+            const tempFactor = (temp - 20) * 0.02;
+            const timeFactor = Math.log(time) * 0.15;
+            const sizeFactor = (size - 100) * 0.001;
+            
+            let optimal = 4.2 + tempFactor + timeFactor + sizeFactor;
+            
+            // Apply constraints for cucumber preservation
+            if (optimal < 3.5) optimal = 3.5;
+            if (optimal > 4.8) optimal = 4.8;
+            
+            return optimal;
+        }
+
+        function calculateEfficiency(ph, temp, time, size) {
+            const optimalPh = calculateOptimalPh(ph, temp, time, size);
+            const phDeviation = Math.abs(ph - optimalPh);
+            
+            let efficiency = 100 - (phDeviation * 25);
+            
+            // Temperature efficiency
+            const tempEfficiency = temp >= 20 && temp <= 30 ? 100 : 100 - Math.abs(25 - temp) * 2;
+            
+            // Time efficiency
+            const timeEfficiency = time >= 6 && time <= 12 ? 100 : 100 - Math.abs(9 - time) * 3;
+            
+            // Size efficiency
+            const sizeEfficiency = size >= 80 && size <= 150 ? 100 : 100 - Math.abs(115 - size) * 0.2;
+            
+            efficiency = (efficiency + tempEfficiency + timeEfficiency + sizeEfficiency) / 4;
+            
+            return Math.max(0, Math.min(100, efficiency));
+        }
+
+        function calculateQuality(ph, temp, time, size, optimalPh) {
+            const phScore = 100 - Math.abs(ph - optimalPh) * 30;
+            const tempScore = temp >= 22 && temp <= 28 ? 100 : 100 - Math.abs(25 - temp) * 3;
+            const timeScore = time >= 6 && time <= 10 ? 100 : 100 - Math.abs(8 - time) * 4;
+            const sizeScore = size >= 100 && size <= 140 ? 100 : 100 - Math.abs(120 - size) * 0.3;
+            
+            const quality = (phScore + tempScore + timeScore + sizeScore) / 4;
+            return Math.max(0, Math.min(100, quality));
+        }
+
+        function getQualityGrade(quality) {
+            if (quality >= 90) return 'Excellent';
+            if (quality >= 80) return 'Very Good';
+            if (quality >= 70) return 'Good';
+            if (quality >= 60) return 'Fair';
+            return 'Poor';
+        }
+
+        function animateResult(elementId, value) {
+            const element = document.getElementById(elementId);
+            element.style.transform = 'scale(1.2)';
+            element.style.transition = 'transform 0.3s';
+            
+            setTimeout(() => {
+                element.textContent = value;
+                element.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        function updateProgressBar(elementId, percentage) {
+            const element = document.getElementById(elementId);
+            setTimeout(() => {
+                element.style.width = percentage + '%';
+            }, 200);
+        }
+
+        function generateRecommendations(ph, temp, time, size, optimalPh, efficiency, quality) {
+            const recommendations = [];
+            
+            if (Math.abs(ph - optimalPh) > 0.3) {
+                recommendations.push(`Adjust pH to ${optimalPh.toFixed(2)} for optimal results`);
+            }
+            
+            if (temp < 22 || temp > 28) {
+                recommendations.push(`Maintain temperature between 22-28°C for best quality`);
+            }
+            
+            if (time < 6 || time > 10) {
+                recommendations.push(`Process for 6-10 hours for optimal acid development`);
+            }
+            
+            if (size < 100 || size > 140) {
+                recommendations.push(`Use cucumbers weighing 100-140g for consistent results`);
+            }
+            
+            if (efficiency < 80) {
+                recommendations.push(`Current efficiency is ${efficiency.toFixed(1)}%. Follow above suggestions to improve`);
+            }
+            
+            const recElement = document.getElementById('recommendation');
+            const recText = document.getElementById('recommendation-text');
+            
+            if (recommendations.length > 0) {
+                recText.textContent = recommendations.join('. ');
+                recElement.style.display = 'block';
+            } else {
+                recText.textContent = 'Perfect! Your parameters are already optimized for cucumber acid set point.';
+                recElement.style.display = 'block';
+            }
+        }
+
+        function drawAcidCurve(currentPh, temp, time, optimalPh) {
+            const canvas = document.getElementById('acidChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Set up coordinate system
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 30;
+            
+            // Draw axes
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.moveTo(padding, height - padding);
+            ctx.lineTo(padding, padding);
+            ctx.stroke();
+            
+            // Draw acid curve
+            ctx.strokeStyle = '#2e8b57';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            const points = 50;
+            for (let i = 0; i <= points; i++) {
+                const x = padding + (i / points) * (width - 2 * padding);
+                const timePoint = (i / points) * time;
+                const acidLevel = calculateAcidAtTime(timePoint, currentPh, temp, optimalPh);
+                const y = height - padding - (acidLevel / 7) * (height - 2 * padding);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            
+            // Mark optimal point
+            const optimalX = padding + (width - 2 * padding) * 0.7;
+            const optimalY = height - padding - (optimalPh / 7) * (height - 2 * padding);
+            
+            ctx.fillStyle = '#ff4444';
+            ctx.beginPath();
+            ctx.arc(optimalX, optimalY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add labels
+            ctx.fillStyle = '#666';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Time', width / 2, height - 5);
+            
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('pH Level', 0, 0);
+            ctx.restore();
+        }
+
+        function calculateAcidAtTime(t, startPh, temp, targetPh) {
+            const tempFactor = (temp - 20) * 0.01;
+            const rate = 0.3 + tempFactor;
+            const progress = 1 - Math.exp(-rate * t);
+            return startPh + (targetPh - startPh) * progress;
+        }
+
+        // Initialize with default optimization
+        setTimeout(() => {
+            optimizeAcidSetPoint();
+        }, 500);
+    </script>
+</body>
+</html>
