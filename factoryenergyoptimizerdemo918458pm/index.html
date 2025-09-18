@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Energy Optimization Dashboard - OKI Electric Industry</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/charts.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="assets/oki-logo.svg" alt="OKI Electric Industry" class="logo">
+                    <div class="title-section">
+                        <h1 data-i18n="app.title">Factory Energy Optimization Dashboard</h1>
+                        <p class="subtitle" data-i18n="app.subtitle">Intelligent Power Management & Cost Reduction</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <div class="language-selector">
+                        <select id="languageSelect">
+                            <option value="en">English</option>
+                            <option value="ja">日本語</option>
+                        </select>
+                    </div>
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span data-i18n="status.connected">Connected</span>
+                    </div>
+                    <div class="last-update">
+                        <span data-i18n="status.lastUpdate">Last Update:</span>
+                        <span id="lastUpdateTime">--:--</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <div class="nav-content">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="overview" data-i18n="nav.overview">Overview</button>
+                    <button class="nav-tab" data-tab="production" data-i18n="nav.production">Production Lines</button>
+                    <button class="nav-tab" data-tab="energy" data-i18n="nav.energy">Energy Analysis</button>
+                    <button class="nav-tab" data-tab="ai-insights" data-i18n="nav.aiInsights">AI Insights</button>
+                    <button class="nav-tab" data-tab="recommendations" data-i18n="nav.recommendations">Recommendations</button>
+                    <button class="nav-tab" data-tab="settings" data-i18n="nav.settings">Settings</button>
+                </div>
+                <div class="alert-badge" id="alertBadge">
+                    <span class="alert-count">3</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active">
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3 data-i18n="kpi.powerConsumption">Power Consumption</h3>
+                            <span class="kpi-icon">⚡</span>
+                        </div>
+                        <div class="kpi-value">
+                            <span id="totalPowerConsumption">--</span>
+                            <span class="kpi-unit">kW</span>
+                        </div>
+                        <div class="kpi-change">
+                            <span id="powerConsumptionChange" class="change-indicator">--</span>
+                            <span data-i18n="kpi.vsYesterday">vs yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3 data-i18n="kpi.energyCost">Energy Cost</h3>
+                            <span class="kpi-icon">💰</span>
+                        </div>
+                        <div class="kpi-value">
+                            <span id="totalEnergyCost">--</span>
+                            <span class="kpi-unit">¥</span>
+                        </div>
+                        <div class="kpi-change">
+                            <span id="energyCostChange" class="change-indicator">--</span>
+                            <span data-i18n="kpi.vsYesterday">vs yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3 data-i18n="kpi.efficiency">Energy Efficiency</h3>
+                            <span class="kpi-icon">📈</span>
+                        </div>
+                        <div class="kpi-value">
+                            <span id="energyEfficiency">--</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <div class="kpi-change">
+                            <span id="efficiencyChange" class="change-indicator">--</span>
+                            <span data-i18n="kpi.vsTarget">vs target</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <h3 data-i18n="kpi.productionOutput">Production Output</h3>
+                            <span class="kpi-icon">🏭</span>
+                        </div>
+                        <div class="kpi-value">
+                            <span id="productionOutput">--</span>
+                            <span class="kpi-unit">units</span>
+                        </div>
+                        <div class="kpi-change">
+                            <span id="outputChange" class="change-indicator">--</span>
+                            <span data-i18n="kpi.vsYesterday">vs yesterday</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 data-i18n="charts.realTimePower">Real-time Power Consumption</h3>
+                            <div class="chart-controls">
+                                <select id="powerTimeRange">
+                                    <option value="1h" data-i18n="time.lastHour">Last Hour</option>
+                                    <option value="4h" data-i18n="time.last4Hours">Last 4 Hours</option>
+                                    <option value="24h" data-i18n="time.last24Hours" selected>Last 24 Hours</option>
+                                </select>
+                            </div>
+                        </div>
+                        <canvas id="powerChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 data-i18n="charts.productionLines">Production Lines Status</h3>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <span class="legend-color line1"></span>
+                                    <span data-i18n="lines.line1">Line 1</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color line2"></span>
+                                    <span data-i18n="lines.line2">Line 2</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color line3"></span>
+                                    <span data-i18n="lines.line3">Line 3</span>
+                                </div>
+                            </div>
+                        </div>
+                        <canvas id="productionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI Insights Panel -->
+                <div class="insights-panel">
+                    <div class="insights-header">
+                        <h3 data-i18n="ai.insights">AI-Generated Insights</h3>
+                        <div class="insights-controls">
+                            <button class="btn-secondary" id="refreshInsights" data-i18n="ai.refresh">Refresh Analysis</button>
+                        </div>
+                    </div>
+                    <div class="insights-content" id="insightsContent">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Lines Tab -->
+            <div id="production-tab" class="tab-content">
+                <div class="production-overview">
+                    <h2 data-i18n="production.title">Production Line Analysis</h2>
+                    <div class="production-grid">
+                        <!-- Production line cards will be generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Energy Analysis Tab -->
+            <div id="energy-tab" class="tab-content">
+                <div class="energy-analysis">
+                    <h2 data-i18n="energy.title">Energy Consumption Analysis</h2>
+                    <div class="energy-charts">
+                        <!-- Energy analysis charts will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Tab -->
+            <div id="ai-insights-tab" class="tab-content">
+                <div class="ai-dashboard">
+                    <h2 data-i18n="ai.title">AI-Powered Analytics</h2>
+                    <div class="ai-panels">
+                        <!-- AI analysis panels will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Tab -->
+            <div id="recommendations-tab" class="tab-content">
+                <div class="recommendations-dashboard">
+                    <h2 data-i18n="recommendations.title">Optimization Recommendations</h2>
+                    <div class="recommendations-content">
+                        <!-- Recommendations will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div class="settings-dashboard">
+                    <h2 data-i18n="settings.title">Configuration & Settings</h2>
+                    <div class="settings-content">
+                        <!-- Settings panels will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Alerts Panel -->
+        <div id="alertsPanel" class="alerts-panel">
+            <div class="alerts-header">
+                <h3 data-i18n="alerts.title">Active Alerts</h3>
+                <button class="close-alerts" id="closeAlerts">×</button>
+            </div>
+            <div class="alerts-content" id="alertsContent">
+                <!-- Alerts will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p data-i18n="loading.analyzing">Analyzing sensor data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/sensors/dataGenerator.js"></script>
+    <script src="js/ai/anomalyDetector.js"></script>
+    <script src="js/ai/optimizationAgent.js"></script>
+    <script src="js/ai/recommendationEngine.js"></script>
+    <script src="js/dashboard/charts.js"></script>
+    <script src="js/dashboard/kpis.js"></script>
+    <script src="js/dashboard/navigation.js"></script>
+    <script src="js/utils/dateUtils.js"></script>
+    <script src="js/utils/calculations.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
