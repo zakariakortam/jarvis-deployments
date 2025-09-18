@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corn Dry Thinning Acid Set Point Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #4a6741);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .results-section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            border-bottom: 3px solid #4a6741;
+            padding-bottom: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4a6741;
+            box-shadow: 0 0 0 3px rgba(74, 103, 65, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4a6741, #2c3e50);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .result-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .optimization-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .parameter-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .parameter-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-optimal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌽 Corn Dry Thinning Acid Optimizer</h1>
+            <p>Optimize acid set points for maximum efficiency and quality</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">Process Parameters</h2>
+                
+                <div class="input-group">
+                    <label for="cornMoisture">Corn Moisture Content (%)</label>
+                    <input type="number" id="cornMoisture" value="14.5" step="0.1" min="10" max="20">
+                </div>
+
+                <div class="input-group">
+                    <label for="flowRate">Flow Rate (tons/hour)</label>
+                    <input type="number" id="flowRate" value="50" step="1" min="10" max="200">
+                </div>
+
+                <div class="input-group">
+                    <label for="temperature">Process Temperature (°C)</label>
+                    <input type="number" id="temperature" value="65" step="1" min="50" max="85">
+                </div>
+
+                <div class="input-group">
+                    <label for="currentPH">Current pH Level</label>
+                    <input type="number" id="currentPH" value="6.5" step="0.1" min="4" max="8">
+                </div>
+
+                <div class="input-group">
+                    <label for="starchContent">Starch Content (%)</label>
+                    <input type="number" id="starchContent" value="68" step="0.5" min="60" max="75">
+                </div>
+
+                <div class="input-group">
+                    <label for="acidType">Acid Type</label>
+                    <select id="acidType">
+                        <option value="sulfuric">Sulfuric Acid (H₂SO₄)</option>
+                        <option value="hydrochloric">Hydrochloric Acid (HCl)</option>
+                        <option value="phosphoric">Phosphoric Acid (H₃PO₄)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="targetYield">Target Yield (%)</label>
+                    <input type="number" id="targetYield" value="95" step="0.5" min="85" max="98">
+                </div>
+
+                <button class="btn" onclick="optimizeAcidSetPoint()">🔬 Optimize Acid Set Point</button>
+            </div>
+
+            <div class="results-section">
+                <h2 class="section-title">Optimization Results</h2>
+                
+                <div class="result-card">
+                    <div class="result-value" id="optimalPH">6.2</div>
+                    <div class="result-label">Optimal pH Set Point</div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-value" id="acidDosage">0.85</div>
+                    <div class="result-label">Acid Dosage (% w/w)</div>
+                </div>
+
+                <div class="optimization-details">
+                    <h3>Process Optimization Details</h3>
+                    
+                    <div class="parameter-row">
+                        <span>Predicted Yield:</span>
+                        <span id="predictedYield">96.2%</span>
+                        <span class="status-indicator status-optimal" id="yieldStatus">Optimal</span>
+                    </div>
+                    
+                    <div class="parameter-row">
+                        <span>Enzyme Efficiency:</span>
+                        <span id="enzymeEfficiency">94.8%</span>
+                        <span class="status-indicator status-optimal" id="enzymeStatus">Optimal</span>
+                    </div>
+                    
+                    <div class="parameter-row">
+                        <span>Viscosity Reduction:</span>
+                        <span id="viscosityReduction">78%</span>
+                        <span class="status-indicator status-optimal" id="viscosityStatus">Good</span>
+                    </div>
+                    
+                    <div class="parameter-row">
+                        <span>Energy Savings:</span>
+                        <span id="energySavings">12.4%</span>
+                        <span class="status-indicator status-optimal" id="energyStatus">Excellent</span>
+                    </div>
+                    
+                    <div class="parameter-row">
+                        <span>Process Time:</span>
+                        <span id="processTime">42 min</span>
+                        <span class="status-indicator status-optimal" id="timeStatus">Optimal</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h4>pH vs Yield Optimization Curve</h4>
+                    <canvas id="optimizationChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function optimizeAcidSetPoint() {
+            // Get input values
+            const cornMoisture = parseFloat(document.getElementById('cornMoisture').value);
+            const flowRate = parseFloat(document.getElementById('flowRate').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const currentPH = parseFloat(document.getElementById('currentPH').value);
+            const starchContent = parseFloat(document.getElementById('starchContent').value);
+            const acidType = document.getElementById('acidType').value;
+            const targetYield = parseFloat(document.getElementById('targetYield').value);
+
+            // Optimization algorithm based on corn dry thinning principles
+            const optimalPH = calculateOptimalPH(cornMoisture, temperature, starchContent, acidType, targetYield);
+            const acidDosage = calculateAcidDosage(optimalPH, currentPH, acidType, flowRate);
+            
+            // Calculate performance metrics
+            const predictedYield = calculatePredictedYield(optimalPH, temperature, starchContent, cornMoisture);
+            const enzymeEfficiency = calculateEnzymeEfficiency(optimalPH, temperature);
+            const viscosityReduction = calculateViscosityReduction(optimalPH, starchContent, temperature);
+            const energySavings = calculateEnergySavings(viscosityReduction, temperature);
+            const processTime = calculateProcessTime(optimalPH, temperature, starchContent);
+
+            // Update display
+            document.getElementById('optimalPH').textContent = optimalPH.toFixed(1);
+            document.getElementById('acidDosage').textContent = acidDosage.toFixed(2);
+            document.getElementById('predictedYield').textContent = predictedYield.toFixed(1) + '%';
+            document.getElementById('enzymeEfficiency').textContent = enzymeEfficiency.toFixed(1) + '%';
+            document.getElementById('viscosityReduction').textContent = viscosityReduction.toFixed(0) + '%';
+            document.getElementById('energySavings').textContent = energySavings.toFixed(1) + '%';
+            document.getElementById('processTime').textContent = processTime.toFixed(0) + ' min';
+
+            // Update status indicators
+            updateStatusIndicators(predictedYield, enzymeEfficiency, viscosityReduction, energySavings);
+            
+            // Draw optimization chart
+            drawOptimizationChart(optimalPH, predictedYield);
+        }
+
+        function calculateOptimalPH(moisture, temperature, starch, acidType, targetYield) {
+            // Advanced optimization algorithm for corn dry thinning
+            let basePH = 6.0;
+            
+            // Adjust for moisture content (lower moisture needs lower pH)
+            basePH -= (moisture - 14.5) * 0.05;
+            
+            // Adjust for temperature (higher temp allows higher pH)
+            basePH += (temperature - 65) * 0.01;
+            
+            // Adjust for starch content (higher starch needs lower pH)
+            basePH -= (starch - 68) * 0.02;
+            
+            // Adjust for target yield (higher yield needs more precise pH)
+            if (targetYield > 95) basePH -= 0.2;
+            
+            // Acid type adjustments
+            switch(acidType) {
+                case 'sulfuric':
+                    basePH -= 0.1; // More effective, can use higher pH
+                    break;
+                case 'hydrochloric':
+                    basePH -= 0.2; // Strong acid, lower pH needed
+                    break;
+                case 'phosphoric':
+                    basePH += 0.1; // Milder, needs lower pH
+                    break;
+            }
+            
+            return Math.max(5.8, Math.min(6.8, basePH));
+        }
+
+        function calculateAcidDosage(optimalPH, currentPH, acidType, flowRate) {
+            const pHDifference = currentPH - optimalPH;
+            let baseDosage = pHDifference * 0.15;
+            
+            // Acid strength factors
+            const acidStrength = {
+                'sulfuric': 1.0,
+                'hydrochloric': 0.85,
+                'phosphoric': 1.2
+            };
+            
+            baseDosage *= acidStrength[acidType];
+            
+            // Flow rate adjustment (higher flow needs proportionally more acid)
+            baseDosage *= Math.sqrt(flowRate / 50);
+            
+            return Math.max(0.1, Math.min(2.0, baseDosage));
+        }
+
+        function calculatePredictedYield(pH, temperature, starch, moisture) {
+            let baseYield = 95.0;
+            
+            // pH optimization curve (6.2 is optimal)
+            const pHOptimal = 6.2;
+            const pHDeviation = Math.abs(pH - pHOptimal);
+            baseYield -= pHDeviation * 3.5;
+            
+            // Temperature optimization (65°C optimal)
+            baseYield -= Math.abs(temperature - 65) * 0.1;
+            
+            // Starch content effect
+            baseYield += (starch - 68) * 0.15;
+            
+            // Moisture effect (14.5% optimal)
+            baseYield -= Math.abs(moisture - 14.5) * 0.3;
+            
+            return Math.max(85, Math.min(98, baseYield));
+        }
+
+        function calculateEnzymeEfficiency(pH, temperature) {
+            // Alpha-amylase efficiency curve
+            let efficiency = 90.0;
+            
+            // Optimal pH range 6.0-6.4
+            if (pH < 6.0 || pH > 6.4) {
+                efficiency -= Math.abs(pH - 6.2) * 8;
+            } else {
+                efficiency += 5; // Bonus for optimal range
+            }
+            
+            // Temperature effect (optimal around 65°C)
+            efficiency -= Math.abs(temperature - 65) * 0.15;
+            
+            return Math.max(70, Math.min(98, efficiency));
+        }
+
+        function calculateViscosityReduction(pH, starch, temperature) {
+            let reduction = 70;
+            
+            // Lower pH increases viscosity reduction
+            reduction += (6.5 - pH) * 12;
+            
+            // Higher starch content increases potential reduction
+            reduction += (starch - 68) * 0.8;
+            
+            // Temperature effect
+            reduction += (temperature - 65) * 0.5;
+            
+            return Math.max(60, Math.min(85, reduction));
+        }
+
+        function calculateEnergySavings(viscosityReduction, temperature) {
+            // Energy savings from reduced viscosity and optimized temperature
+            let savings = viscosityReduction * 0.15;
+            savings += Math.max(0, 70 - temperature) * 0.2;
+            return Math.max(5, Math.min(20, savings));
+        }
+
+        function calculateProcessTime(pH, temperature, starch) {
+            let baseTime = 45; // minutes
+            
+            // Lower pH reduces process time
+            baseTime -= (6.5 - pH) * 8;
+            
+            // Higher temperature reduces time
+            baseTime -= (temperature - 60) * 0.5;
+            
+            // Higher starch increases time
+            baseTime += (starch - 68) * 0.3;
+            
+            return Math.max(25, Math.min(60, baseTime));
+        }
+
+        function updateStatusIndicators(yield, enzyme, viscosity, energy) {
+            const indicators = [
+                {id: 'yieldStatus', value: yield, thresholds: [95, 90]},
+                {id: 'enzymeStatus', value: enzyme, thresholds: [90, 85]},
+                {id: 'viscosityStatus', value: viscosity, thresholds: [75, 70]},
+                {id: 'energyStatus', value: energy, thresholds: [12, 8]}
+            ];
+            
+            indicators.forEach(indicator => {
+                const element = document.getElementById(indicator.id);
+                if (indicator.value >= indicator.thresholds[0]) {
+                    element.className = 'status-indicator status-optimal';
+                    element.textContent = 'Optimal';
+                } else if (indicator.value >= indicator.thresholds[1]) {
+                    element.className = 'status-indicator status-warning';
+                    element.textContent = 'Good';
+                } else {
+                    element.className = 'status-indicator status-critical';
+                    element.textContent = 'Needs Attention';
+                }
+            });
+        }
+
+        function drawOptimizationChart(optimalPH, predictedYield) {
+            const canvas = document.getElementById('optimizationChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Set up chart dimensions
+            const margin = 40;
+            const chartWidth = canvas.width - 2 * margin;
+            const chartHeight = canvas.height - 2 * margin;
+            
+            // Draw axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(margin, margin);
+            ctx.lineTo(margin, margin + chartHeight);
+            ctx.lineTo(margin + chartWidth, margin + chartHeight);
+            ctx.stroke();
+            
+            // Generate curve data
+            const pHRange = [];
+            const yieldRange = [];
+            
+            for (let pH = 5.5; pH <= 7.0; pH += 0.1) {
+                pHRange.push(pH);
+                // Simulate yield curve with peak around 6.2
+                let yield = 95 - Math.pow((pH - 6.2) * 5, 2);
+                yieldRange.push(Math.max(85, Math.min(98, yield)));
+            }
+            
+            // Draw curve
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            pHRange.forEach((pH, index) => {
+                const x = margin + ((pH - 5.5) / 1.5) * chartWidth;
+                const y = margin + chartHeight - ((yieldRange[index] - 85) / 13) * chartHeight;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Mark optimal point
+            const optimalX = margin + ((optimalPH - 5.5) / 1.5) * chartWidth;
+            const optimalY = margin + chartHeight - ((predictedYield - 85) / 13) * chartHeight;
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(optimalX, optimalY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add labels
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText('pH', canvas.width / 2, canvas.height - 10);
+            
+            ctx.save();
+            ctx.translate(15, canvas.height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Yield (%)', 0, 0);
+            ctx.restore();
+        }
+
+        // Initialize with default calculation
+        optimizeAcidSetPoint();
+    </script>
+</body>
+</html>
