@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squash Dry Thinning Acid Set Point Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel, .results-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .input-panel h2, .results-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .result-unit {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .optimization-status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-optimal {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-critical {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .data-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🥒 Squash Acid Optimizer</h1>
+            <p>Optimize acid set point for dry thinning process</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-panel">
+                <h2>Process Parameters</h2>
+                
+                <div class="input-group">
+                    <label for="squashType">Squash Type:</label>
+                    <select id="squashType">
+                        <option value="butternut">Butternut</option>
+                        <option value="acorn">Acorn</option>
+                        <option value="hubbard">Hubbard</option>
+                        <option value="delicata">Delicata</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="moisture">Moisture Content (%):</label>
+                    <input type="number" id="moisture" min="10" max="95" value="85" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="temperature">Process Temperature (°C):</label>
+                    <input type="number" id="temperature" min="20" max="80" value="65" step="0.5">
+                </div>
+
+                <div class="input-group">
+                    <label for="pumpRate">Pump Flow Rate (L/min):</label>
+                    <input type="number" id="pumpRate" min="0.1" max="10" value="2.5" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="targetThickness">Target Thickness (mm):</label>
+                    <input type="number" id="targetThickness" min="1" max="20" value="8" step="0.5">
+                </div>
+
+                <div class="input-group">
+                    <label for="batchSize">Batch Size (kg):</label>
+                    <input type="number" id="batchSize" min="1" max="1000" value="100" step="1">
+                </div>
+
+                <button class="btn" onclick="optimizeAcidSetPoint()">
+                    🔬 Optimize Acid Set Point
+                </button>
+
+                <button class="btn" onclick="resetParameters()" style="background: linear-gradient(135deg, #ff6b6b, #ffa500); margin-top: 10px;">
+                    🔄 Reset Parameters
+                </button>
+            </div>
+
+            <div class="results-panel">
+                <h2>Optimization Results</h2>
+                
+                <div class="result-card">
+                    <div>Optimal Acid Set Point</div>
+                    <div class="result-value" id="acidSetPoint">0.00</div>
+                    <div class="result-unit">pH units</div>
+                </div>
+
+                <div class="result-card">
+                    <div>Acid Concentration</div>
+                    <div class="result-value" id="acidConcentration">0.00</div>
+                    <div class="result-unit">mol/L</div>
+                </div>
+
+                <div class="result-card">
+                    <div>Efficiency Rating</div>
+                    <div class="result-value" id="efficiency">0%</div>
+                    <div class="result-unit">process efficiency</div>
+                </div>
+
+                <div class="optimization-status" id="optimizationStatus">
+                    Click "Optimize" to calculate optimal parameters
+                </div>
+
+                <div class="chart-container">
+                    <h3>Process Timeline</h3>
+                    <canvas id="processChart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="data-log" id="dataLog">
+                    <div class="log-entry">System initialized - Ready for optimization</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dataPoints = [];
+        let logCount = 1;
+
+        function optimizeAcidSetPoint() {
+            const squashType = document.getElementById('squashType').value;
+            const moisture = parseFloat(document.getElementById('moisture').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const pumpRate = parseFloat(document.getElementById('pumpRate').value);
+            const targetThickness = parseFloat(document.getElementById('targetThickness').value);
+            const batchSize = parseFloat(document.getElementById('batchSize').value);
+
+            const squashFactors = {
+                butternut: { density: 0.92, acidTolerance: 1.2 },
+                acorn: { density: 0.88, acidTolerance: 1.1 },
+                hubbard: { density: 0.95, acidTolerance: 1.3 },
+                delicata: { density: 0.85, acidTolerance: 1.0 }
+            };
+
+            const factor = squashFactors[squashType];
+            
+            const moistureCorrection = 1 + (moisture - 80) * 0.01;
+            const temperatureCorrection = 1 + (temperature - 60) * 0.015;
+            const thicknessCorrection = Math.sqrt(targetThickness / 8);
+            const flowCorrection = Math.log(pumpRate + 1) / Math.log(3.5);
+            
+            const baseAcidSetPoint = 3.8;
+            const optimalPH = baseAcidSetPoint * factor.acidTolerance * moistureCorrection * temperatureCorrection * thicknessCorrection * flowCorrection;
+            
+            const acidConcentration = Math.pow(10, -(optimalPH)) * 1000;
+            
+            let efficiency = 100;
+            if (optimalPH < 3.0 || optimalPH > 5.5) efficiency -= 25;
+            if (temperature < 50 || temperature > 75) efficiency -= 15;
+            if (moisture < 70 || moisture > 90) efficiency -= 10;
+            efficiency = Math.max(efficiency, 45);
+            
+            document.getElementById('acidSetPoint').textContent = optimalPH.toFixed(2);
+            document.getElementById('acidConcentration').textContent = acidConcentration.toFixed(4);
+            document.getElementById('efficiency').textContent = efficiency.toFixed(0) + '%';
+            
+            let statusClass = 'status-optimal';
+            let statusText = '✅ Optimal conditions achieved';
+            
+            if (efficiency < 70) {
+                statusClass = 'status-warning';
+                statusText = '⚠️ Suboptimal conditions - review parameters';
+            }
+            if (efficiency < 50) {
+                statusClass = 'status-critical';
+                statusText = '🚨 Critical conditions - immediate adjustment required';
+            }
+            
+            const statusElement = document.getElementById('optimizationStatus');
+            statusElement.className = `optimization-status ${statusClass}`;
+            statusElement.textContent = statusText;
+            
+            addLogEntry(`Optimization ${logCount++}: pH=${optimalPH.toFixed(2)}, Efficiency=${efficiency.toFixed(0)}%, ${squashType.toUpperCase()}`);
+            
+            dataPoints.push({
+                time: new Date().toLocaleTimeString(),
+                ph: optimalPH,
+                efficiency: efficiency
+            });
+            
+            updateChart();
+        }
+
+        function resetParameters() {
+            document.getElementById('squashType').value = 'butternut';
+            document.getElementById('moisture').value = '85';
+            document.getElementById('temperature').value = '65';
+            document.getElementById('pumpRate').value = '2.5';
+            document.getElementById('targetThickness').value = '8';
+            document.getElementById('batchSize').value = '100';
+            
+            document.getElementById('acidSetPoint').textContent = '0.00';
+            document.getElementById('acidConcentration').textContent = '0.00';
+            document.getElementById('efficiency').textContent = '0%';
+            
+            const statusElement = document.getElementById('optimizationStatus');
+            statusElement.className = 'optimization-status';
+            statusElement.textContent = 'Parameters reset - Click "Optimize" to calculate';
+            
+            dataPoints = [];
+            updateChart();
+            addLogEntry('System reset - Parameters cleared');
+        }
+
+        function addLogEntry(message) {
+            const logDiv = document.getElementById('dataLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+            
+            if (logDiv.children.length > 50) {
+                logDiv.removeChild(logDiv.lastChild);
+            }
+        }
+
+        function updateChart() {
+            const canvas = document.getElementById('processChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (dataPoints.length === 0) return;
+            
+            const padding = 40;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding;
+            
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(padding + chartWidth, y);
+                ctx.stroke();
+            }
+            
+            if (dataPoints.length > 1) {
+                ctx.strokeStyle = '#667eea';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                for (let i = 0; i < dataPoints.length; i++) {
+                    const x = padding + (chartWidth / (dataPoints.length - 1)) * i;
+                    const y = padding + chartHeight - (dataPoints[i].ph / 6) * chartHeight;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                
+                for (let i = 0; i < dataPoints.length; i++) {
+                    const x = padding + (chartWidth / (dataPoints.length - 1)) * i;
+                    const y = padding + chartHeight - (dataPoints[i].ph / 6) * chartHeight;
+                    
+                    ctx.fillStyle = '#667eea';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Process Timeline', canvas.width / 2, 20);
+            ctx.fillText('pH Level', 20, canvas.height / 2);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addLogEntry('Squash Acid Optimizer initialized successfully');
+            updateChart();
+        });
+    </script>
+</body>
+</html>
