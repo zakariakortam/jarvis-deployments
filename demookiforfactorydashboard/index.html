@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Factory Equipment Monitoring Dashboard" data-lang-ja="工場設備監視ダッシュボード">Factory Equipment Monitoring Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="oki-logo">OKI</div>
+                <h1 data-lang-en="Factory Equipment Monitoring" data-lang-ja="工場設備監視システム">Factory Equipment Monitoring</h1>
+            </div>
+            <div class="header-controls">
+                <select id="languageSelector" class="language-selector">
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+                <div class="status-indicator">
+                    <span class="status-dot active"></span>
+                    <span data-lang-en="Live" data-lang-ja="ライブ">Live</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sidebar">
+        <div class="nav-item active" data-tab="overview">
+            <span class="nav-icon">📊</span>
+            <span data-lang-en="Overview" data-lang-ja="概要">Overview</span>
+        </div>
+        <div class="nav-item" data-tab="equipment">
+            <span class="nav-icon">⚙️</span>
+            <span data-lang-en="Equipment" data-lang-ja="設備">Equipment</span>
+        </div>
+        <div class="nav-item" data-tab="production">
+            <span class="nav-icon">🏭</span>
+            <span data-lang-en="Production" data-lang-ja="生産">Production</span>
+        </div>
+        <div class="nav-item" data-tab="analytics">
+            <span class="nav-icon">📈</span>
+            <span data-lang-en="Analytics" data-lang-ja="分析">Analytics</span>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="tab-content active" id="overview">
+            <div class="dashboard-grid">
+                <div class="card kpi-cards">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="totalProduction">0</div>
+                        <div class="kpi-label" data-lang-en="Total Production" data-lang-ja="総生産数">Total Production</div>
+                        <div class="kpi-change positive">+2.3%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="efficiency">0%</div>
+                        <div class="kpi-label" data-lang-en="Efficiency" data-lang-ja="効率">Efficiency</div>
+                        <div class="kpi-change positive">+1.8%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="powerConsumption">0 kW</div>
+                        <div class="kpi-label" data-lang-en="Power Consumption" data-lang-ja="消費電力">Power Consumption</div>
+                        <div class="kpi-change negative">+0.5%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="dailyCost">¥0</div>
+                        <div class="kpi-label" data-lang-en="Daily Cost" data-lang-ja="日次コスト">Daily Cost</div>
+                        <div class="kpi-change negative">+1.2%</div>
+                    </div>
+                </div>
+
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <h3 data-lang-en="Real-time Production Metrics" data-lang-ja="リアルタイム生産指標">Real-time Production Metrics</h3>
+                    </div>
+                    <canvas id="productionChart"></canvas>
+                </div>
+
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <h3 data-lang-en="Equipment Status" data-lang-ja="設備状況">Equipment Status</h3>
+                    </div>
+                    <div class="equipment-status-grid">
+                        <div class="equipment-item" id="equipment1">
+                            <div class="equipment-name" data-lang-en="Production Line A" data-lang-ja="生産ラインA">Production Line A</div>
+                            <div class="equipment-status running">Running</div>
+                            <div class="equipment-metrics">
+                                <span data-lang-en="Speed:" data-lang-ja="速度:">Speed:</span> <span id="line1-speed">0</span> units/min
+                            </div>
+                        </div>
+                        <div class="equipment-item" id="equipment2">
+                            <div class="equipment-name" data-lang-en="Production Line B" data-lang-ja="生産ラインB">Production Line B</div>
+                            <div class="equipment-status running">Running</div>
+                            <div class="equipment-metrics">
+                                <span data-lang-en="Speed:" data-lang-ja="速度:">Speed:</span> <span id="line2-speed">0</span> units/min
+                            </div>
+                        </div>
+                        <div class="equipment-item" id="equipment3">
+                            <div class="equipment-name" data-lang-en="Quality Control" data-lang-ja="品質管理">Quality Control</div>
+                            <div class="equipment-status running">Running</div>
+                            <div class="equipment-metrics">
+                                <span data-lang-en="Pass Rate:" data-lang-ja="合格率:">Pass Rate:</span> <span id="qc-pass-rate">0</span>%
+                            </div>
+                        </div>
+                        <div class="equipment-item" id="equipment4">
+                            <div class="equipment-name" data-lang-en="Packaging Unit" data-lang-ja="包装ユニット">Packaging Unit</div>
+                            <div class="equipment-status running">Running</div>
+                            <div class="equipment-metrics">
+                                <span data-lang-en="Throughput:" data-lang-ja="処理能力:">Throughput:</span> <span id="packaging-throughput">0</span> pkg/min
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card gauge-container">
+                    <div class="card-header">
+                        <h3 data-lang-en="Temperature Monitoring" data-lang-ja="温度監視">Temperature Monitoring</h3>
+                    </div>
+                    <div class="gauges-grid">
+                        <div class="gauge-wrapper">
+                            <canvas id="tempGauge1" width="150" height="150"></canvas>
+                            <div class="gauge-label" data-lang-en="Furnace 1" data-lang-ja="炉1">Furnace 1</div>
+                        </div>
+                        <div class="gauge-wrapper">
+                            <canvas id="tempGauge2" width="150" height="150"></canvas>
+                            <div class="gauge-label" data-lang-en="Furnace 2" data-lang-ja="炉2">Furnace 2</div>
+                        </div>
+                        <div class="gauge-wrapper">
+                            <canvas id="voltageGauge" width="150" height="150"></canvas>
+                            <div class="gauge-label" data-lang-en="Main Voltage" data-lang-ja="主電圧">Main Voltage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="equipment">
+            <div class="card">
+                <div class="card-header">
+                    <h3 data-lang-en="Equipment Details" data-lang-ja="設備詳細">Equipment Details</h3>
+                    <div class="search-container">
+                        <input type="text" id="equipmentSearch" placeholder="Search equipment..." data-lang-en-placeholder="Search equipment..." data-lang-ja-placeholder="設備を検索...">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="equipmentTable">
+                        <thead>
+                            <tr>
+                                <th data-lang-en="Equipment ID" data-lang-ja="設備ID">Equipment ID</th>
+                                <th data-lang-en="Name" data-lang-ja="名前">Name</th>
+                                <th data-lang-en="Status" data-lang-ja="状況">Status</th>
+                                <th data-lang-en="Temperature (°C)" data-lang-ja="温度 (°C)">Temperature (°C)</th>
+                                <th data-lang-en="Voltage (V)" data-lang-ja="電圧 (V)">Voltage (V)</th>
+                                <th data-lang-en="Power (kW)" data-lang-ja="電力 (kW)">Power (kW)</th>
+                                <th data-lang-en="Last Updated" data-lang-ja="最終更新">Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipmentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="production">
+            <div class="dashboard-grid">
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <h3 data-lang-en="Hourly Production Rate" data-lang-ja="時間別生産率">Hourly Production Rate</h3>
+                    </div>
+                    <canvas id="hourlyProductionChart"></canvas>
+                </div>
+                
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <h3 data-lang-en="Production Cost Breakdown" data-lang-ja="生産コスト内訳">Production Cost Breakdown</h3>
+                    </div>
+                    <canvas id="costBreakdownChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="analytics">
+            <div class="dashboard-grid">
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <h3 data-lang-en="Performance Trends" data-lang-ja="パフォーマンストレンド">Performance Trends</h3>
+                    </div>
+                    <canvas id="performanceTrendChart"></canvas>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 data-lang-en="Predictive Alerts" data-lang-ja="予測アラート">Predictive Alerts</h3>
+                    </div>
+                    <div id="alertsContainer" class="alerts-container">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
