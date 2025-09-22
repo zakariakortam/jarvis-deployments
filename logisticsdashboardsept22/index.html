@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Logistics Command Center" data-lang-jp="物流指令センター">Logistics Command Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1 data-lang-en="Global Logistics Hub" data-lang-jp="グローバル物流ハブ">Global Logistics Hub</h1>
+                <div class="status-indicator live"></div>
+                <span class="live-text" data-lang-en="LIVE" data-lang-jp="ライブ">LIVE</span>
+            </div>
+            <div class="header-controls">
+                <div class="language-toggle">
+                    <button id="lang-en" class="lang-btn active">EN</button>
+                    <button id="lang-jp" class="lang-btn">JP</button>
+                </div>
+                <div class="timestamp" id="current-time"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-grid">
+            <!-- KPI Overview Panel -->
+            <section class="kpi-panel">
+                <h2 data-lang-en="Key Performance Indicators" data-lang-jp="主要業績評価指標">Key Performance Indicators</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="active-trucks">127</div>
+                        <div class="kpi-label" data-lang-en="Active Trucks" data-lang-jp="稼働中トラック">Active Trucks</div>
+                        <div class="kpi-trend up">+12%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="deliveries-today">342</div>
+                        <div class="kpi-label" data-lang-en="Deliveries Today" data-lang-jp="本日の配送">Deliveries Today</div>
+                        <div class="kpi-trend up">+8%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="fuel-efficiency">7.2L</div>
+                        <div class="kpi-label" data-lang-en="Avg Fuel/100km" data-lang-jp="平均燃費/100km">Avg Fuel/100km</div>
+                        <div class="kpi-trend down">-3%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="cost-savings">¥2.8M</div>
+                        <div class="kpi-label" data-lang-en="Cost Savings" data-lang-jp="コスト削減">Cost Savings</div>
+                        <div class="kpi-trend up">+15%</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fleet Map -->
+            <section class="map-panel">
+                <h2 data-lang-en="Real-Time Fleet Tracking" data-lang-jp="リアルタイム車両追跡">Real-Time Fleet Tracking</h2>
+                <div id="fleet-map" class="map-container"></div>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <div class="legend-color delivery"></div>
+                        <span data-lang-en="In Transit" data-lang-jp="輸送中">In Transit</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color warehouse"></div>
+                        <span data-lang-en="At Warehouse" data-lang-jp="倉庫内">At Warehouse</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color maintenance"></div>
+                        <span data-lang-en="Maintenance" data-lang-jp="メンテナンス">Maintenance</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Series Charts -->
+            <section class="charts-panel">
+                <div class="chart-tabs">
+                    <button class="tab-btn active" data-chart="deliveries" data-lang-en="Delivery Performance" data-lang-jp="配送パフォーマンス">Delivery Performance</button>
+                    <button class="tab-btn" data-chart="fuel" data-lang-en="Fuel Consumption" data-lang-jp="燃料消費">Fuel Consumption</button>
+                    <button class="tab-btn" data-chart="costs" data-lang-en="Cost Analysis" data-lang-jp="コスト分析">Cost Analysis</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="main-chart"></canvas>
+                </div>
+            </section>
+
+            <!-- Shipment Tracking Table -->
+            <section class="table-panel">
+                <div class="table-header">
+                    <h2 data-lang-en="Active Shipments" data-lang-jp="アクティブな出荷">Active Shipments</h2>
+                    <div class="table-controls">
+                        <input type="text" id="search-input" placeholder="Search shipments..." data-placeholder-en="Search shipments..." data-placeholder-jp="出荷を検索...">
+                        <select id="status-filter">
+                            <option value="all" data-lang-en="All Status" data-lang-jp="全ステータス">All Status</option>
+                            <option value="in-transit" data-lang-en="In Transit" data-lang-jp="輸送中">In Transit</option>
+                            <option value="delivered" data-lang-en="Delivered" data-lang-jp="配送完了">Delivered</option>
+                            <option value="delayed" data-lang-en="Delayed" data-lang-jp="遅延">Delayed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="shipments-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="id" data-lang-en="Shipment ID" data-lang-jp="出荷ID">Shipment ID</th>
+                                <th class="sortable" data-sort="origin" data-lang-en="Origin" data-lang-jp="出発地">Origin</th>
+                                <th class="sortable" data-sort="destination" data-lang-en="Destination" data-lang-jp="目的地">Destination</th>
+                                <th class="sortable" data-sort="status" data-lang-en="Status" data-lang-jp="ステータス">Status</th>
+                                <th class="sortable" data-sort="eta" data-lang-en="ETA" data-lang-jp="到着予定">ETA</th>
+                                <th class="sortable" data-sort="driver" data-lang-en="Driver" data-lang-jp="ドライバー">Driver</th>
+                                <th class="sortable" data-sort="priority" data-lang-en="Priority" data-lang-jp="優先度">Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shipments-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Warehouse Inventory -->
+            <section class="inventory-panel">
+                <h2 data-lang-en="Warehouse Status" data-lang-jp="倉庫状況">Warehouse Status</h2>
+                <div class="warehouse-grid">
+                    <div class="warehouse-card">
+                        <div class="warehouse-header">
+                            <h3>Tokyo Central</h3>
+                            <div class="capacity-indicator">
+                                <div class="capacity-bar">
+                                    <div class="capacity-fill" style="width: 78%"></div>
+                                </div>
+                                <span>78%</span>
+                            </div>
+                        </div>
+                        <div class="warehouse-stats">
+                            <div class="stat">
+                                <span class="stat-value">15,240</span>
+                                <span class="stat-label" data-lang-en="Items" data-lang-jp="アイテム">Items</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">23</span>
+                                <span class="stat-label" data-lang-en="Inbound" data-lang-jp="入庫予定">Inbound</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">67</span>
+                                <span class="stat-label" data-lang-en="Outbound" data-lang-jp="出庫予定">Outbound</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="warehouse-card">
+                        <div class="warehouse-header">
+                            <h3>Osaka Hub</h3>
+                            <div class="capacity-indicator">
+                                <div class="capacity-bar">
+                                    <div class="capacity-fill" style="width: 65%"></div>
+                                </div>
+                                <span>65%</span>
+                            </div>
+                        </div>
+                        <div class="warehouse-stats">
+                            <div class="stat">
+                                <span class="stat-value">12,890</span>
+                                <span class="stat-label" data-lang-en="Items" data-lang-jp="アイテム">Items</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">18</span>
+                                <span class="stat-label" data-lang-en="Inbound" data-lang-jp="入庫予定">Inbound</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">45</span>
+                                <span class="stat-label" data-lang-en="Outbound" data-lang-jp="出庫予定">Outbound</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="warehouse-card">
+                        <div class="warehouse-header">
+                            <h3>Yokohama Port</h3>
+                            <div class="capacity-indicator">
+                                <div class="capacity-bar">
+                                    <div class="capacity-fill" style="width: 89%"></div>
+                                </div>
+                                <span>89%</span>
+                            </div>
+                        </div>
+                        <div class="warehouse-stats">
+                            <div class="stat">
+                                <span class="stat-value">8,567</span>
+                                <span class="stat-label" data-lang-en="Items" data-lang-jp="アイテム">Items</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">31</span>
+                                <span class="stat-label" data-lang-en="Inbound" data-lang-jp="入庫予定">Inbound</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">28</span>
+                                <span class="stat-label" data-lang-en="Outbound" data-lang-jp="出庫予定">Outbound</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="data-simulator.js"></script>
+    <script src="map-controller.js"></script>
+    <script src="chart-controller.js"></script>
+    <script src="table-controller.js"></script>
+    <script src="language-controller.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
