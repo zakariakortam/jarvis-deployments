@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Monitoring Dashboard - MedTech Solutions</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span class="logo-text">MedTech Solutions</span>
+            </div>
+            <h1 id="main-title" class="dashboard-title">Patient Monitoring Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <div class="language-switcher">
+                <button id="lang-en" class="lang-btn active">English</button>
+                <button id="lang-ja" class="lang-btn">日本語</button>
+            </div>
+            <div class="system-status">
+                <i class="fas fa-circle status-online"></i>
+                <span id="status-text">System Online</span>
+            </div>
+            <div class="current-time" id="current-time"></div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-grid">
+            <!-- Real-time Vitals Section -->
+            <div class="card vitals-overview">
+                <div class="card-header">
+                    <h3 id="vitals-title">Live Patient Vitals</h3>
+                    <div class="patient-count">
+                        <span id="active-patients">Active Patients: 12</span>
+                    </div>
+                </div>
+                <div class="vitals-grid">
+                    <div class="vital-card heart-rate">
+                        <div class="vital-icon"><i class="fas fa-heartbeat"></i></div>
+                        <div class="vital-info">
+                            <div class="vital-value" id="heart-rate">78</div>
+                            <div class="vital-label" id="hr-label">Heart Rate (BPM)</div>
+                            <div class="vital-trend trend-up">↑ 2.3%</div>
+                        </div>
+                    </div>
+                    <div class="vital-card oxygen">
+                        <div class="vital-icon"><i class="fas fa-lungs"></i></div>
+                        <div class="vital-info">
+                            <div class="vital-value" id="oxygen-level">98</div>
+                            <div class="vital-label" id="o2-label">Oxygen Level (%)</div>
+                            <div class="vital-trend trend-stable">→ 0.1%</div>
+                        </div>
+                    </div>
+                    <div class="vital-card temperature">
+                        <div class="vital-icon"><i class="fas fa-thermometer-half"></i></div>
+                        <div class="vital-info">
+                            <div class="vital-value" id="temperature">36.8</div>
+                            <div class="vital-label" id="temp-label">Temperature (°C)</div>
+                            <div class="vital-trend trend-down">↓ 0.5%</div>
+                        </div>
+                    </div>
+                    <div class="vital-card blood-pressure">
+                        <div class="vital-icon"><i class="fas fa-tint"></i></div>
+                        <div class="vital-info">
+                            <div class="vital-value" id="blood-pressure">120/80</div>
+                            <div class="vital-label" id="bp-label">Blood Pressure</div>
+                            <div class="vital-trend trend-up">↑ 1.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="card chart-section">
+                <div class="card-header">
+                    <h3 id="trends-title">Vital Signs Trends</h3>
+                    <div class="chart-controls">
+                        <select id="time-range">
+                            <option value="1h">Last Hour</option>
+                            <option value="6h">Last 6 Hours</option>
+                            <option value="24h" selected>Last 24 Hours</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="vitalsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Patient Stability Gauges -->
+            <div class="card gauges-section">
+                <div class="card-header">
+                    <h3 id="stability-title">Patient Stability Scores</h3>
+                </div>
+                <div class="gauges-grid">
+                    <div class="gauge-container">
+                        <canvas id="criticalGauge" width="120" height="120"></canvas>
+                        <div class="gauge-label" id="critical-label">Critical (3)</div>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="stableGauge" width="120" height="120"></canvas>
+                        <div class="gauge-label" id="stable-label">Stable (8)</div>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="recoveryGauge" width="120" height="120"></canvas>
+                        <div class="gauge-label" id="recovery-label">Recovery (1)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medication Usage Chart -->
+            <div class="card medication-chart">
+                <div class="card-header">
+                    <h3 id="medication-title">Medication Usage Distribution</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="medicationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Treatment Costs -->
+            <div class="card costs-section">
+                <div class="card-header">
+                    <h3 id="costs-title">Treatment Costs Overview</h3>
+                </div>
+                <div class="costs-grid">
+                    <div class="cost-item">
+                        <div class="cost-value" id="daily-cost">¥1,250,000</div>
+                        <div class="cost-label" id="daily-label">Daily Cost</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-value" id="monthly-cost">¥32,500,000</div>
+                        <div class="cost-label" id="monthly-label">Monthly Total</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-value" id="avg-cost">¥104,167</div>
+                        <div class="cost-label" id="avg-label">Avg per Patient</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="costsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Patient Data Table -->
+            <div class="card patient-table">
+                <div class="card-header">
+                    <h3 id="patients-title">Patient Data Table</h3>
+                    <div class="table-controls">
+                        <input type="text" id="search-input" placeholder="Search patients...">
+                        <select id="filter-status">
+                            <option value="all">All Status</option>
+                            <option value="critical">Critical</option>
+                            <option value="stable">Stable</option>
+                            <option value="recovery">Recovery</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="patients-data-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="id" id="th-id">Patient ID</th>
+                                <th data-sort="name" id="th-name">Name</th>
+                                <th data-sort="age" id="th-age">Age</th>
+                                <th data-sort="status" id="th-status">Status</th>
+                                <th data-sort="heartRate" id="th-hr">HR</th>
+                                <th data-sort="oxygen" id="th-o2">O2</th>
+                                <th data-sort="temperature" id="th-temp">Temp</th>
+                                <th data-sort="cost" id="th-cost">Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patient-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-info">
+            <span id="footer-text">© 2025 MedTech Solutions - Patient Monitoring System v2.1.0</span>
+        </div>
+        <div class="footer-stats">
+            <span id="data-points">Data Points: <span id="data-count">0</span></span>
+            <span id="last-update">Last Update: <span id="update-time">--:--</span></span>
+        </div>
+    </div>
+
+    <script src="data-generator.js"></script>
+    <script src="charts.js"></script>
+    <script src="translations.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
