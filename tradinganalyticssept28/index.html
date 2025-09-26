@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analytics Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0a0e1a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .trading-terminal {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+            gap: 2px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background-color: #1a1f2e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #2a3441;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4aa;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #00ff88;
+        }
+
+        .left-panel {
+            background-color: #1a1f2e;
+            border-right: 2px solid #2a3441;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            background-color: #111827;
+            display: grid;
+            grid-template-rows: 2fr 1fr;
+            gap: 2px;
+        }
+
+        .right-panel {
+            background-color: #1a1f2e;
+            border-left: 2px solid #2a3441;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 15px;
+            border-bottom: 1px solid #2a3441;
+            font-weight: 600;
+            background-color: #252a3a;
+        }
+
+        .chart-container {
+            position: relative;
+            background-color: #0f1419;
+            border-bottom: 2px solid #2a3441;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .metric-card {
+            background-color: #1a1f2e;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #2a3441;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .positive {
+            color: #00ff88;
+        }
+
+        .negative {
+            color: #ff4757;
+        }
+
+        .neutral {
+            color: #00d4aa;
+        }
+
+        .watchlist {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .watchlist-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid #2a3441;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .watchlist-item:hover {
+            background-color: #252a3a;
+        }
+
+        .symbol {
+            font-weight: 600;
+        }
+
+        .price {
+            font-family: monospace;
+        }
+
+        .table-container {
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #2a3441;
+        }
+
+        .data-table th {
+            background-color: #252a3a;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+        }
+
+        .data-table th:hover {
+            background-color: #2a3441;
+        }
+
+        .portfolio-section,
+        .orders-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .volatility-gauge {
+            width: 120px;
+            height: 120px;
+            margin: 10px auto;
+            position: relative;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .risk-breakdown {
+            padding: 15px;
+        }
+
+        .risk-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .risk-bar {
+            width: 60px;
+            height: 6px;
+            background-color: #2a3441;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            background-color: #00d4aa;
+            border-radius: 3px;
+        }
+
+        .scrollbar-custom {
+            scrollbar-width: thin;
+            scrollbar-color: #4a5568 #1a1f2e;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: #1a1f2e;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 3px;
+        }
+
+        .chart-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .control-btn {
+            background-color: #2a3441;
+            border: none;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .control-btn:hover {
+            background-color: #374151;
+        }
+
+        .control-btn.active {
+            background-color: #00d4aa;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="trading-terminal">
+        <div class="header">
+            <div class="logo">Trading Analytics Platform</div>
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Market Open</span>
+                </div>
+                <div class="status-item">
+                    <span id="current-time">09:30:00 EST</span>
+                </div>
+                <div class="status-item">
+                    <span>Data Feed: <span id="tick-count">0</span> ticks/sec</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="left-panel scrollbar-custom">
+            <div class="panel-header">Market Watch</div>
+            <div class="watchlist" id="watchlist">
+                <!-- Watchlist items will be populated by JavaScript -->
+            </div>
+            
+            <div class="panel-header">Volatility</div>
+            <div class="volatility-gauge">
+                <svg class="gauge-svg" id="volatility-gauge">
+                    <!-- SVG gauge will be created by JavaScript -->
+                </svg>
+            </div>
+
+            <div class="panel-header">Risk Exposure</div>
+            <div class="risk-breakdown" id="risk-breakdown">
+                <!-- Risk breakdown will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chart-container">
+                <div class="chart-controls">
+                    <button class="control-btn active" data-timeframe="1m">1M</button>
+                    <button class="control-btn" data-timeframe="5m">5M</button>
+                    <button class="control-btn" data-timeframe="15m">15M</button>
+                    <button class="control-btn" data-timeframe="1h">1H</button>
+                    <button class="control-btn" data-timeframe="1d">1D</button>
+                </div>
+                <canvas class="chart-canvas" id="price-chart"></canvas>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Total P&L</div>
+                    <div class="metric-value positive" id="total-pnl">$0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Daily P&L</div>
+                    <div class="metric-value neutral" id="daily-pnl">$0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Portfolio Value</div>
+                    <div class="metric-value" id="portfolio-value">$1,000,000.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Cash Available</div>
+                    <div class="metric-value" id="cash-available">$500,000.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">VaR (1-Day)</div>
+                    <div class="metric-value negative" id="var-1day">$0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Sharpe Ratio</div>
+                    <div class="metric-value neutral" id="sharpe-ratio">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel scrollbar-custom">
+            <div class="portfolio-section">
+                <div class="panel-header">Portfolio</div>
+                <div class="table-container scrollbar-custom">
+                    <table class="data-table" id="portfolio-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="symbol">Symbol</th>
+                                <th data-sort="quantity">Qty</th>
+                                <th data-sort="price">Price</th>
+                                <th data-sort="pnl">P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolio-tbody">
+                            <!-- Portfolio rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="orders-section">
+                <div class="panel-header">Recent Orders</div>
+                <div class="table-container scrollbar-custom">
+                    <table class="data-table" id="orders-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="time">Time</th>
+                                <th data-sort="symbol">Symbol</th>
+                                <th data-sort="side">Side</th>
+                                <th data-sort="quantity">Qty</th>
+                                <th data-sort="price">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <!-- Order rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Trading Analytics Platform JavaScript
+        class TradingPlatform {
+            constructor() {
+                this.symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX', 'ORCL', 'CRM'];
+                this.fxPairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'USD/CHF', 'AUD/USD'];
+                this.marketData = {};
+                this.portfolioData = {};
+                this.orders = [];
+                this.candleData = {};
+                this.currentSymbol = 'AAPL';
+                this.timeframe = '1m';
+                this.tickCount = 0;
+                
+                this.initializeData();
+                this.setupEventListeners();
+                this.startDataFeeds();
+                this.initializeChart();
+                this.updateTime();
+            }
+
+            initializeData() {
+                // Initialize market data for stocks
+                this.symbols.forEach(symbol => {
+                    const basePrice = 100 + Math.random() * 200;
+                    this.marketData[symbol] = {
+                        price: basePrice,
+                        bid: basePrice - 0.01,
+                        ask: basePrice + 0.01,
+                        volume: Math.floor(Math.random() * 1000000),
+                        change: 0,
+                        changePercent: 0,
+                        volatility: 0.15 + Math.random() * 0.35
+                    };
+                    
+                    this.candleData[symbol] = [];
+                    this.portfolioData[symbol] = {
+                        quantity: Math.floor(Math.random() * 1000) + 100,
+                        avgPrice: basePrice * (0.95 + Math.random() * 0.1),
+                        pnl: 0
+                    };
+                });
+
+                // Initialize FX data
+                this.fxPairs.forEach(pair => {
+                    const basePrice = 1 + Math.random() * 0.5;
+                    this.marketData[pair] = {
+                        price: basePrice,
+                        bid: basePrice - 0.0001,
+                        ask: basePrice + 0.0001,
+                        volume: Math.floor(Math.random() * 10000000),
+                        change: 0,
+                        changePercent: 0,
+                        volatility: 0.08 + Math.random() * 0.12
+                    };
+                    this.candleData[pair] = [];
+                });
+
+                this.generateInitialCandles();
+            }
+
+            generateInitialCandles() {
+                const now = Date.now();
+                const candleInterval = 60000; // 1 minute
+                
+                Object.keys(this.marketData).forEach(symbol => {
+                    const data = this.marketData[symbol];
+                    
+                    for (let i = 100; i >= 0; i--) {
+                        const timestamp = now - (i * candleInterval);
+                        const open = data.price * (0.98 + Math.random() * 0.04);
+                        const volatility = data.volatility;
+                        const high = open * (1 + Math.random() * volatility);
+                        const low = open * (1 - Math.random() * volatility);
+                        const close = low + Math.random() * (high - low);
+                        
+                        this.candleData[symbol].push({
+                            timestamp,
+                            open,
+                            high,
+                            low,
+                            close,
+                            volume: Math.floor(Math.random() * 100000)
+                        });
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // Chart timeframe controls
+                document.querySelectorAll('.control-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelector('.control-btn.active').classList.remove('active');
+                        e.target.classList.add('active');
+                        this.timeframe = e.target.dataset.timeframe;
+                        this.updateChart();
+                    });
+                });
+
+                // Table sorting
+                document.querySelectorAll('[data-sort]').forEach(header => {
+                    header.addEventListener('click', (e) => {
+                        this.sortTable(e.target.closest('table'), e.target.dataset.sort);
+                    });
+                });
+
+                // Watchlist symbol selection
+                document.getElementById('watchlist').addEventListener('click', (e) => {
+                    const item = e.target.closest('.watchlist-item');
+                    if (item) {
+                        this.currentSymbol = item.dataset.symbol;
+                        this.updateChart();
+                        document.querySelectorAll('.watchlist-item').forEach(el => el.classList.remove('active'));
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            startDataFeeds() {
+                // High-frequency market data updates
+                setInterval(() => {
+                    this.updateMarketData();
+                    this.tickCount += this.symbols.length + this.fxPairs.length;
+                }, 100); // 10 updates per second
+
+                // Portfolio and P&L updates
+                setInterval(() => {
+                    this.updatePortfolio();
+                    this.updateMetrics();
+                }, 1000);
+
+                // Chart updates
+                setInterval(() => {
+                    this.updateChart();
+                }, 5000);
+
+                // Generate random orders
+                setInterval(() => {
+                    this.generateRandomOrder();
+                }, 2000);
+
+                // Update displays
+                setInterval(() => {
+                    this.updateWatchlist();
+                    this.updatePortfolioTable();
+                    this.updateOrdersTable();
+                    this.updateVolatilityGauge();
+                    this.updateRiskBreakdown();
+                    document.getElementById('tick-count').textContent = Math.floor(this.tickCount / 10);
+                    this.tickCount = 0;
+                }, 1000);
+            }
+
+            updateMarketData() {
+                [...this.symbols, ...this.fxPairs].forEach(symbol => {
+                    const data = this.marketData[symbol];
+                    const volatility = data.volatility;
+                    const change = (Math.random() - 0.5) * volatility * 0.01;
+                    
+                    data.price = Math.max(0.01, data.price * (1 + change));
+                    data.bid = data.price - (symbol.includes('/') ? 0.0001 : 0.01);
+                    data.ask = data.price + (symbol.includes('/') ? 0.0001 : 0.01);
+                    data.change += change * data.price;
+                    data.changePercent = (data.change / (data.price - data.change)) * 100;
+                    data.volume += Math.floor(Math.random() * 10000);
+                });
+            }
+
+            updatePortfolio() {
+                let totalPnl = 0;
+                
+                this.symbols.forEach(symbol => {
+                    const portfolio = this.portfolioData[symbol];
+                    const market = this.marketData[symbol];
+                    
+                    portfolio.pnl = (market.price - portfolio.avgPrice) * portfolio.quantity;
+                    totalPnl += portfolio.pnl;
+                });
+
+                this.totalPnl = totalPnl;
+            }
+
+            updateMetrics() {
+                document.getElementById('total-pnl').textContent = this.formatCurrency(this.totalPnl);
+                document.getElementById('total-pnl').className = `metric-value ${this.totalPnl >= 0 ? 'positive' : 'negative'}`;
+                
+                const dailyPnl = this.totalPnl * 0.3;
+                document.getElementById('daily-pnl').textContent = this.formatCurrency(dailyPnl);
+                document.getElementById('daily-pnl').className = `metric-value ${dailyPnl >= 0 ? 'positive' : 'negative'}`;
+                
+                const portfolioValue = 1000000 + this.totalPnl;
+                document.getElementById('portfolio-value').textContent = this.formatCurrency(portfolioValue);
+                
+                const var1day = Math.abs(this.totalPnl * 0.02);
+                document.getElementById('var-1day').textContent = this.formatCurrency(-var1day);
+                
+                const sharpeRatio = (this.totalPnl / 1000000) * Math.sqrt(252) / 0.15;
+                document.getElementById('sharpe-ratio').textContent = sharpeRatio.toFixed(2);
+            }
+
+            updateWatchlist() {
+                const watchlist = document.getElementById('watchlist');
+                watchlist.innerHTML = '';
+                
+                [...this.symbols, ...this.fxPairs].forEach(symbol => {
+                    const data = this.marketData[symbol];
+                    const item = document.createElement('div');
+                    item.className = 'watchlist-item';
+                    item.dataset.symbol = symbol;
+                    
+                    const changeClass = data.changePercent >= 0 ? 'positive' : 'negative';
+                    
+                    item.innerHTML = `
+                        <div>
+                            <div class="symbol">${symbol}</div>
+                            <div class="change ${changeClass}">${data.changePercent.toFixed(2)}%</div>
+                        </div>
+                        <div>
+                            <div class="price">${data.price.toFixed(symbol.includes('/') ? 4 : 2)}</div>
+                            <div style="font-size: 10px; color: #9ca3af;">${this.formatVolume(data.volume)}</div>
+                        </div>
+                    `;
+                    
+                    watchlist.appendChild(item);
+                });
+            }
+
+            updatePortfolioTable() {
+                const tbody = document.getElementById('portfolio-tbody');
+                tbody.innerHTML = '';
+                
+                this.symbols.forEach(symbol => {
+                    const portfolio = this.portfolioData[symbol];
+                    const market = this.marketData[symbol];
+                    
+                    const row = document.createElement('tr');
+                    const pnlClass = portfolio.pnl >= 0 ? 'positive' : 'negative';
+                    
+                    row.innerHTML = `
+                        <td>${symbol}</td>
+                        <td>${portfolio.quantity.toLocaleString()}</td>
+                        <td>$${market.price.toFixed(2)}</td>
+                        <td class="${pnlClass}">$${portfolio.pnl.toFixed(2)}</td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+
+            updateOrdersTable() {
+                const tbody = document.getElementById('orders-tbody');
+                tbody.innerHTML = '';
+                
+                this.orders.slice(-50).reverse().forEach(order => {
+                    const row = document.createElement('tr');
+                    const sideClass = order.side === 'BUY' ? 'positive' : 'negative';
+                    
+                    row.innerHTML = `
+                        <td>${order.time}</td>
+                        <td>${order.symbol}</td>
+                        <td class="${sideClass}">${order.side}</td>
+                        <td>${order.quantity.toLocaleString()}</td>
+                        <td>$${order.price.toFixed(2)}</td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+
+            generateRandomOrder() {
+                const symbol = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+                const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
+                const quantity = Math.floor(Math.random() * 1000) + 100;
+                const price = this.marketData[symbol].price * (0.99 + Math.random() * 0.02);
+                
+                const order = {
+                    time: new Date().toLocaleTimeString(),
+                    symbol,
+                    side,
+                    quantity,
+                    price
+                };
+                
+                this.orders.push(order);
+                
+                // Update portfolio
+                if (Math.random() > 0.3) { // 70% fill rate
+                    const portfolio = this.portfolioData[symbol];
+                    if (side === 'BUY') {
+                        portfolio.quantity += quantity;
+                        portfolio.avgPrice = (portfolio.avgPrice * (portfolio.quantity - quantity) + price * quantity) / portfolio.quantity;
+                    } else if (portfolio.quantity >= quantity) {
+                        portfolio.quantity -= quantity;
+                    }
+                }
+            }
+
+            updateVolatilityGauge() {
+                const currentVol = this.marketData[this.currentSymbol]?.volatility || 0.2;
+                const percentage = Math.min(currentVol / 0.5 * 100, 100);
+                
+                const gauge = document.getElementById('volatility-gauge');
+                gauge.innerHTML = `
+                    <circle cx="60" cy="60" r="45" stroke="#2a3441" stroke-width="8" fill="none"/>
+                    <circle cx="60" cy="60" r="45" stroke="#00d4aa" stroke-width="8" fill="none"
+                            stroke-dasharray="${percentage * 2.83} 283" stroke-dashoffset="0" 
+                            transform="rotate(-90 60 60)" stroke-linecap="round"/>
+                    <text x="60" y="60" text-anchor="middle" dy="5" font-size="14" fill="#ffffff">
+                        ${(currentVol * 100).toFixed(1)}%
+                    </text>
+                    <text x="60" y="80" text-anchor="middle" font-size="10" fill="#9ca3af">
+                        Volatility
+                    </text>
+                `;
+            }
+
+            updateRiskBreakdown() {
+                const riskBreakdown = document.getElementById('risk-breakdown');
+                const risks = [
+                    { label: 'Market Risk', value: 0.65 },
+                    { label: 'Credit Risk', value: 0.15 },
+                    { label: 'Liquidity Risk', value: 0.25 },
+                    { label: 'Operational Risk', value: 0.05 }
+                ];
+                
+                riskBreakdown.innerHTML = risks.map(risk => `
+                    <div class="risk-item">
+                        <span>${risk.label}</span>
+                        <div>
+                            <div class="risk-bar">
+                                <div class="risk-fill" style="width: ${risk.value * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            initializeChart() {
+                const canvas = document.getElementById('price-chart');
+                this.chartContext = canvas.getContext('2d');
+                this.resizeChart();
+                window.addEventListener('resize', () => this.resizeChart());
+            }
+
+            resizeChart() {
+                const canvas = document.getElementById('price-chart');
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                this.updateChart();
+            }
+
+            updateChart() {
+                const canvas = document.getElementById('price-chart');
+                const ctx = this.chartContext;
+                const width = canvas.width;
+                const height = canvas.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                if (!this.candleData[this.currentSymbol] || this.candleData[this.currentSymbol].length === 0) {
+                    return;
+                }
+                
+                const data = this.candleData[this.currentSymbol].slice(-60); // Last 60 candles
+                const padding = 50;
+                const chartWidth = width - padding * 2;
+                const chartHeight = height - padding * 2;
+                
+                // Calculate price range
+                let minPrice = Math.min(...data.map(d => d.low));
+                let maxPrice = Math.max(...data.map(d => d.high));
+                const priceRange = maxPrice - minPrice;
+                minPrice -= priceRange * 0.1;
+                maxPrice += priceRange * 0.1;
+                const totalRange = maxPrice - minPrice;
+                
+                const candleWidth = chartWidth / data.length * 0.8;
+                const candleSpacing = chartWidth / data.length;
+                
+                // Draw grid
+                ctx.strokeStyle = '#2a3441';
+                ctx.lineWidth = 1;
+                
+                // Horizontal grid lines
+                for (let i = 0; i <= 10; i++) {
+                    const y = padding + (chartHeight / 10) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(padding, y);
+                    ctx.lineTo(width - padding, y);
+                    ctx.stroke();
+                    
+                    // Price labels
+                    const price = maxPrice - (totalRange / 10) * i;
+                    ctx.fillStyle = '#9ca3af';
+                    ctx.font = '12px monospace';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(price.toFixed(2), padding - 10, y + 4);
+                }
+                
+                // Vertical grid lines
+                const timeStep = Math.max(1, Math.floor(data.length / 10));
+                for (let i = 0; i < data.length; i += timeStep) {
+                    const x = padding + candleSpacing * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, padding);
+                    ctx.lineTo(x, height - padding);
+                    ctx.stroke();
+                }
+                
+                // Draw candlesticks
+                data.forEach((candle, index) => {
+                    const x = padding + candleSpacing * index;
+                    const openY = padding + (maxPrice - candle.open) / totalRange * chartHeight;
+                    const closeY = padding + (maxPrice - candle.close) / totalRange * chartHeight;
+                    const highY = padding + (maxPrice - candle.high) / totalRange * chartHeight;
+                    const lowY = padding + (maxPrice - candle.low) / totalRange * chartHeight;
+                    
+                    const isGreen = candle.close > candle.open;
+                    
+                    // Draw wick
+                    ctx.strokeStyle = isGreen ? '#00ff88' : '#ff4757';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x + candleSpacing / 2, highY);
+                    ctx.lineTo(x + candleSpacing / 2, lowY);
+                    ctx.stroke();
+                    
+                    // Draw body
+                    ctx.fillStyle = isGreen ? '#00ff88' : '#ff4757';
+                    const bodyTop = Math.min(openY, closeY);
+                    const bodyHeight = Math.abs(closeY - openY) || 1;
+                    ctx.fillRect(x + (candleSpacing - candleWidth) / 2, bodyTop, candleWidth, bodyHeight);
+                });
+                
+                // Add current price line
+                const currentPrice = this.marketData[this.currentSymbol]?.price;
+                if (currentPrice) {
+                    const currentY = padding + (maxPrice - currentPrice) / totalRange * chartHeight;
+                    ctx.strokeStyle = '#00d4aa';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(padding, currentY);
+                    ctx.lineTo(width - padding, currentY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Price label
+                    ctx.fillStyle = '#00d4aa';
+                    ctx.font = 'bold 12px monospace';
+                    ctx.textAlign = 'left';
+                    ctx.fillRect(width - padding + 5, currentY - 8, 60, 16);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillText(currentPrice.toFixed(2), width - padding + 10, currentY + 4);
+                }
+                
+                // Chart title
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(`${this.currentSymbol} - ${this.timeframe}`, padding, 30);
+            }
+
+            updateTime() {
+                setInterval(() => {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('en-US', {
+                        timeZone: 'America/New_York',
+                        hour12: false
+                    }) + ' EST';
+                    document.getElementById('current-time').textContent = timeStr;
+                }, 1000);
+            }
+
+            sortTable(table, column) {
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                
+                rows.sort((a, b) => {
+                    const aValue = a.cells[this.getColumnIndex(table, column)].textContent;
+                    const bValue = b.cells[this.getColumnIndex(table, column)].textContent;
+                    
+                    if (column === 'quantity' || column === 'price' || column === 'pnl') {
+                        return parseFloat(aValue.replace(/[^-\d.]/g, '')) - parseFloat(bValue.replace(/[^-\d.]/g, ''));
+                    }
+                    
+                    return aValue.localeCompare(bValue);
+                });
+                
+                rows.forEach(row => tbody.appendChild(row));
+            }
+
+            getColumnIndex(table, column) {
+                const headers = table.querySelectorAll('th[data-sort]');
+                for (let i = 0; i < headers.length; i++) {
+                    if (headers[i].dataset.sort === column) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2
+                }).format(amount);
+            }
+
+            formatVolume(volume) {
+                if (volume >= 1000000) {
+                    return (volume / 1000000).toFixed(1) + 'M';
+                } else if (volume >= 1000) {
+                    return (volume / 1000).toFixed(1) + 'K';
+                }
+                return volume.toString();
+            }
+        }
+
+        // Initialize the trading platform
+        document.addEventListener('DOMContentLoaded', () => {
+            new TradingPlatform();
+        });
+    </script>
+</body>
+</html>
