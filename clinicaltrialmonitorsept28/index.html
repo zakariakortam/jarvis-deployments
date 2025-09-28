@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Trial Monitoring Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <h1>Clinical Trial Monitoring Platform</h1>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <span class="stat-label">Active Trials</span>
+                    <span class="stat-value" id="activeTrials">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Participants</span>
+                    <span class="stat-value" id="totalParticipants">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Active Sites</span>
+                    <span class="stat-value" id="activeSites">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Data Updates/sec</span>
+                    <span class="stat-value" id="updateRate">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Trial Progress Section -->
+            <section class="dashboard-section">
+                <h2>Trial Progress</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="enrollmentChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="doseComplianceChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trial Health Gauges -->
+            <section class="dashboard-section">
+                <h2>Trial Health Metrics</h2>
+                <div class="gauges-grid">
+                    <div class="gauge-container">
+                        <canvas id="enrollmentRateGauge"></canvas>
+                        <p>Enrollment Rate</p>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="retentionRateGauge"></canvas>
+                        <p>Retention Rate</p>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="complianceGauge"></canvas>
+                        <p>Protocol Compliance</p>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="dataQualityGauge"></canvas>
+                        <p>Data Quality Score</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Demographics Section -->
+            <section class="dashboard-section">
+                <h2>Participant Demographics</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="ageDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="genderDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="siteDistributionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Side Effects & Safety -->
+            <section class="dashboard-section">
+                <h2>Safety Monitoring</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="sideEffectsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cost Analysis -->
+            <section class="dashboard-section">
+                <h2>Cost Analysis</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="costTrendChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="costBreakdownChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patient Table -->
+            <section class="dashboard-section">
+                <h2>Patient Registry</h2>
+                <div class="table-controls">
+                    <input type="text" id="patientSearch" placeholder="Search patients..." class="search-input">
+                    <select id="patientFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="enrolled">Enrolled</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="withdrawn">Withdrawn</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table id="patientTable">
+                        <thead>
+                            <tr>
+                                <th data-sort="id">Patient ID</th>
+                                <th data-sort="site">Site</th>
+                                <th data-sort="age">Age</th>
+                                <th data-sort="gender">Gender</th>
+                                <th data-sort="enrollDate">Enroll Date</th>
+                                <th data-sort="status">Status</th>
+                                <th data-sort="compliance">Compliance %</th>
+                                <th data-sort="sideEffects">Side Effects</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Site Performance Table -->
+            <section class="dashboard-section">
+                <h2>Site Performance</h2>
+                <div class="table-controls">
+                    <input type="text" id="siteSearch" placeholder="Search sites..." class="search-input">
+                </div>
+                <div class="table-container">
+                    <table id="siteTable">
+                        <thead>
+                            <tr>
+                                <th data-sort="id">Site ID</th>
+                                <th data-sort="name">Site Name</th>
+                                <th data-sort="location">Location</th>
+                                <th data-sort="enrolled">Enrolled</th>
+                                <th data-sort="target">Target</th>
+                                <th data-sort="performance">Performance</th>
+                                <th data-sort="quality">Quality Score</th>
+                                <th data-sort="cost">Monthly Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="siteTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="data-generator.js"></script>
+    <script src="visualizations.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
