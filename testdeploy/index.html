@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Market Dashboard | リアルタイム市場ダッシュボード</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <svg class="company-logo" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="25" cy="25" r="20" fill="#00d4ff" opacity="0.2"/>
+                    <path d="M15 25 L25 15 L35 25 L25 35 Z" fill="#00d4ff"/>
+                    <circle cx="25" cy="25" r="5" fill="#ffffff"/>
+                </svg>
+                <h1 data-en="Financial Market Dashboard" data-jp="リアルタイム市場ダッシュボード">Financial Market Dashboard</h1>
+            </div>
+            <div class="header-controls">
+                <div class="market-status">
+                    <span class="status-indicator pulsing"></span>
+                    <span data-en="Markets Open" data-jp="市場オープン">Markets Open</span>
+                </div>
+                <button class="lang-toggle" onclick="toggleLanguage()">
+                    <span class="lang-icon">🌐</span>
+                    <span id="currentLang">EN</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-container">
+        <!-- Key Metrics Panel -->
+        <section class="metrics-panel">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span data-en="Portfolio Value" data-jp="ポートフォリオ価値">Portfolio Value</span>
+                    <span class="metric-change positive" id="portfolioChange">+0.00%</span>
+                </div>
+                <div class="metric-value" id="portfolioValue">$0.00</div>
+                <div class="metric-subtext" data-en="Total Assets" data-jp="総資産">Total Assets</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span data-en="Daily P&L" data-jp="日次損益">Daily P&L</span>
+                    <span class="metric-change" id="dailyPnLChange">+0.00%</span>
+                </div>
+                <div class="metric-value" id="dailyPnL">$0.00</div>
+                <div class="metric-subtext" data-en="Since Market Open" data-jp="市場開始以降">Since Market Open</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span data-en="Trading Volume" data-jp="取引量">Trading Volume</span>
+                    <span class="metric-change neutral" id="volumeChange">--</span>
+                </div>
+                <div class="metric-value" id="tradingVolume">0</div>
+                <div class="metric-subtext" data-en="Transactions Today" data-jp="本日の取引">Transactions Today</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span data-en="Total Fees" data-jp="総手数料">Total Fees</span>
+                    <span class="metric-change" id="feesChange">--</span>
+                </div>
+                <div class="metric-value" id="totalFees">$0.00</div>
+                <div class="metric-subtext" data-en="Trading Costs" data-jp="取引コスト">Trading Costs</div>
+            </div>
+        </section>
+
+        <!-- Exchange Rates Ticker -->
+        <section class="exchange-ticker">
+            <div class="ticker-scroll">
+                <div class="ticker-item">
+                    <span class="ticker-label">USD/JPY</span>
+                    <span class="ticker-value" id="usdJpy">0.00</span>
+                    <span class="ticker-trend" id="usdJpyTrend">▲ 0.00%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-label">EUR/USD</span>
+                    <span class="ticker-value" id="eurUsd">0.00</span>
+                    <span class="ticker-trend" id="eurUsdTrend">▲ 0.00%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-label">GBP/USD</span>
+                    <span class="ticker-value" id="gbpUsd">0.00</span>
+                    <span class="ticker-trend" id="gbpUsdTrend">▲ 0.00%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-label">BTC/USD</span>
+                    <span class="ticker-value" id="btcUsd">0.00</span>
+                    <span class="ticker-trend" id="btcUsdTrend">▲ 0.00%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-grid">
+            <!-- Candlestick Chart -->
+            <div class="chart-container large">
+                <div class="chart-header">
+                    <h2 data-en="Live Stock Prices" data-jp="リアルタイム株価">Live Stock Prices</h2>
+                    <div class="chart-controls">
+                        <select id="stockSelector" onchange="changeStock(this.value)">
+                            <option value="AAPL">Apple Inc. (AAPL)</option>
+                            <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
+                            <option value="MSFT">Microsoft Corp. (MSFT)</option>
+                            <option value="TSLA">Tesla Inc. (TSLA)</option>
+                            <option value="AMZN">Amazon.com Inc. (AMZN)</option>
+                        </select>
+                        <div class="timeframe-selector">
+                            <button class="timeframe-btn active" onclick="changeTimeframe('1m')">1m</button>
+                            <button class="timeframe-btn" onclick="changeTimeframe('5m')">5m</button>
+                            <button class="timeframe-btn" onclick="changeTimeframe('15m')">15m</button>
+                            <button class="timeframe-btn" onclick="changeTimeframe('1h')">1h</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="candlestickChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Portfolio Allocation -->
+            <div class="chart-container medium">
+                <div class="chart-header">
+                    <h2 data-en="Portfolio Allocation" data-jp="ポートフォリオ配分">Portfolio Allocation</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="portfolioChart"></canvas>
+                </div>
+                <div class="portfolio-legend" id="portfolioLegend"></div>
+            </div>
+
+            <!-- Market Trends -->
+            <div class="chart-container medium">
+                <div class="chart-header">
+                    <h2 data-en="Market Indices" data-jp="市場指数">Market Indices</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="indicesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Table -->
+        <section class="transactions-section">
+            <div class="section-header">
+                <h2 data-en="Recent Transactions" data-jp="最近の取引">Recent Transactions</h2>
+                <div class="table-controls">
+                    <input type="text" id="searchInput" placeholder="Search transactions..." data-en-placeholder="Search transactions..." data-jp-placeholder="取引を検索...">
+                    <select id="filterType" onchange="filterTransactions()">
+                        <option value="all" data-en="All Types" data-jp="全種類">All Types</option>
+                        <option value="BUY" data-en="Buy Only" data-jp="買いのみ">Buy Only</option>
+                        <option value="SELL" data-en="Sell Only" data-jp="売りのみ">Sell Only</option>
+                    </select>
+                    <select id="filterAsset" onchange="filterTransactions()">
+                        <option value="all" data-en="All Assets" data-jp="全資産">All Assets</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('time')" data-en="Time" data-jp="時刻">Time <span class="sort-icon">↕</span></th>
+                            <th onclick="sortTable('type')" data-en="Type" data-jp="種類">Type <span class="sort-icon">↕</span></th>
+                            <th onclick="sortTable('asset')" data-en="Asset" data-jp="資産">Asset <span class="sort-icon">↕</span></th>
+                            <th onclick="sortTable('quantity')" data-en="Quantity" data-jp="数量">Quantity <span class="sort-icon">↕</span></th>
+                            <th onclick="sortTable('price')" data-en="Price" data-jp="価格">Price <span class="sort-icon">↕</span></th>
+                            <th onclick="sortTable('total')" data-en="Total" data-jp="合計">Total <span class="sort-icon">↕</span></th>
+                            <th onclick="sortTable('fee')" data-en="Fee" data-jp="手数料">Fee <span class="sort-icon">↕</span></th>
+                            <th data-en="Status" data-jp="ステータス">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- Transactions will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <div class="pagination">
+                    <button onclick="previousPage()" data-en="Previous" data-jp="前へ">Previous</button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button onclick="nextPage()" data-en="Next" data-jp="次へ">Next</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
