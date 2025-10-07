@@ -1,0 +1,718 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #0a0e1a;
+    color: #e0e0e0;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    min-height: 100vh;
+    padding: 20px;
+    max-width: 2400px;
+    margin: 0 auto;
+}
+
+/* Header Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, #1a1f2e 0%, #2a3142 100%);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #2a3442;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-content h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background: rgba(42, 52, 66, 0.4);
+    border-radius: 8px;
+    border: 1px solid #3a4556;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #8a92a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.status-online {
+    color: #4caf50;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Control Panel */
+.control-panel {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: #1a1f2e;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #2a3442;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group label {
+    font-size: 14px;
+    color: #8a92a6;
+    white-space: nowrap;
+}
+
+.control-group select,
+.range-select,
+.search-input {
+    padding: 8px 12px;
+    background: #2a3142;
+    border: 1px solid #3a4556;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.control-group select:hover,
+.range-select:hover {
+    border-color: #4a9eff;
+}
+
+.control-group select:focus,
+.range-select:focus,
+.search-input:focus {
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #4a9eff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #3a8eef;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #2a3142;
+    color: #e0e0e0;
+    border: 1px solid #3a4556;
+}
+
+.btn-secondary:hover {
+    background: #3a4152;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 20px;
+}
+
+.panel {
+    background: #1a1f2e;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a3442;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.panel-large {
+    grid-column: span 2;
+}
+
+.panel-medium {
+    grid-column: span 1;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #2a3442;
+}
+
+.panel-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.update-indicator {
+    color: #4caf50;
+    font-size: 20px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.3; }
+}
+
+/* Chart Styles */
+canvas {
+    max-height: 300px;
+}
+
+.chart-stats,
+.distribution-legend,
+.occupancy-stats,
+.cost-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #2a3442;
+}
+
+.stat,
+.cost-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat .label,
+.cost-item .label {
+    font-size: 12px;
+    color: #8a92a6;
+    margin-bottom: 4px;
+}
+
+.stat .value,
+.cost-item .value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cost-item .value.highlight {
+    color: #4a9eff;
+}
+
+/* Gauge Styles */
+.gauges-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.gauge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: rgba(42, 52, 66, 0.3);
+    border-radius: 8px;
+}
+
+.gauge-container canvas {
+    max-width: 150px;
+    max-height: 150px;
+}
+
+.gauge-label {
+    font-size: 12px;
+    color: #8a92a6;
+    margin-top: 8px;
+}
+
+.gauge-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #4a9eff;
+    margin-top: 4px;
+}
+
+/* HVAC Grid */
+.hvac-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.hvac-metric {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(42, 52, 66, 0.3);
+    border-radius: 8px;
+    border: 1px solid #3a4556;
+}
+
+.metric-icon {
+    font-size: 28px;
+}
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #8a92a6;
+}
+
+.metric-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Heatmap */
+.heatmap-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.color-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.color-box.low {
+    background: #4caf50;
+}
+
+.color-box.medium {
+    background: #ff9800;
+}
+
+.color-box.high {
+    background: #f44336;
+}
+
+.heatmap-container {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(42, 52, 66, 0.3);
+    border-radius: 8px;
+}
+
+.heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(74, 158, 255, 0.5);
+}
+
+/* Maintenance Table */
+.table-container {
+    overflow-x: auto;
+    margin-top: 16px;
+}
+
+.maintenance-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.maintenance-table thead {
+    background: #2a3142;
+    position: sticky;
+    top: 0;
+}
+
+.maintenance-table th {
+    padding: 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8a92a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.maintenance-table th:hover {
+    color: #4a9eff;
+}
+
+.sort-icon {
+    margin-left: 4px;
+    opacity: 0.5;
+}
+
+.maintenance-table tbody tr {
+    border-bottom: 1px solid #2a3442;
+    transition: background 0.2s;
+}
+
+.maintenance-table tbody tr:hover {
+    background: rgba(74, 158, 255, 0.05);
+}
+
+.maintenance-table td {
+    padding: 12px;
+    font-size: 13px;
+    color: #e0e0e0;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-operational {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+}
+
+.status-warning {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+}
+
+.status-critical {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.status-maintenance {
+    background: rgba(74, 158, 255, 0.2);
+    color: #4a9eff;
+}
+
+.action-btn {
+    padding: 4px 12px;
+    background: #2a3142;
+    border: 1px solid #3a4556;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: #3a4152;
+    border-color: #4a9eff;
+}
+
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #2a3442;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-btn {
+    padding: 6px 12px;
+    background: #2a3142;
+    border: 1px solid #3a4556;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: #3a4152;
+    border-color: #4a9eff;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.table-stats {
+    font-size: 13px;
+    color: #8a92a6;
+}
+
+/* Equipment Status */
+.equipment-status {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.status-card {
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.status-card.operational {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-card.warning {
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.status-card.critical {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.status-card.maintenance {
+    background: rgba(74, 158, 255, 0.1);
+    border: 1px solid rgba(74, 158, 255, 0.3);
+}
+
+.status-count {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.status-card.operational .status-count {
+    color: #4caf50;
+}
+
+.status-card.warning .status-count {
+    color: #ff9800;
+}
+
+.status-card.critical .status-count {
+    color: #f44336;
+}
+
+.status-card.maintenance .status-count {
+    color: #4a9eff;
+}
+
+.status-label {
+    font-size: 12px;
+    color: #8a92a6;
+    text-transform: uppercase;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #1a1f2e;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow: hidden;
+    border: 1px solid #2a3442;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #2a3442;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #f44336;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(80vh - 80px);
+}
+
+.alert-item {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.alert-item.critical {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: #f44336;
+}
+
+.alert-item.warning {
+    background: rgba(255, 152, 0, 0.1);
+    border-color: #ff9800;
+}
+
+.alert-item.info {
+    background: rgba(74, 158, 255, 0.1);
+    border-color: #4a9eff;
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.alert-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.alert-time {
+    font-size: 12px;
+    color: #8a92a6;
+}
+
+.alert-description {
+    font-size: 13px;
+    color: #e0e0e0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-large,
+    .panel-medium {
+        grid-column: span 1;
+    }
+
+    .gauges-grid,
+    .hvac-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 12px;
+    }
+
+    .header-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .control-panel {
+        flex-direction: column;
+    }
+
+    .gauges-grid,
+    .hvac-grid,
+    .equipment-status {
+        grid-template-columns: 1fr;
+    }
+
+    .heatmap-container {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}

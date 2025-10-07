@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Management Dashboard - IoT Infrastructure Control</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Building Management System</h1>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Active Buildings</span>
+                        <span class="stat-value" id="buildingCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Devices</span>
+                        <span class="stat-value" id="deviceCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Data Points/sec</span>
+                        <span class="stat-value" id="dataRate">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">System Status</span>
+                        <span class="stat-value status-online" id="systemStatus">ONLINE</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-group">
+                <label for="buildingSelect">Building:</label>
+                <select id="buildingSelect"></select>
+            </div>
+            <div class="control-group">
+                <label for="floorSelect">Floor:</label>
+                <select id="floorSelect"></select>
+            </div>
+            <div class="control-group">
+                <label for="systemFilter">System Type:</label>
+                <select id="systemFilter">
+                    <option value="all">All Systems</option>
+                    <option value="hvac">HVAC</option>
+                    <option value="lighting">Lighting</option>
+                    <option value="energy">Energy</option>
+                    <option value="occupancy">Occupancy</option>
+                    <option value="equipment">Equipment</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button id="exportBtn" class="btn-primary">Export Data</button>
+                <button id="alertsBtn" class="btn-secondary">View Alerts (<span id="alertCount">0</span>)</button>
+            </div>
+        </div>
+
+        <!-- Main Grid Layout -->
+        <div class="dashboard-grid">
+            <!-- Real-time Energy Consumption -->
+            <div class="panel panel-large">
+                <div class="panel-header">
+                    <h2>Real-Time Energy Consumption</h2>
+                    <div class="panel-actions">
+                        <span class="update-indicator" id="energyUpdate">●</span>
+                        <select id="energyTimeRange" class="range-select">
+                            <option value="1">1 min</option>
+                            <option value="5">5 min</option>
+                            <option value="15" selected>15 min</option>
+                            <option value="60">1 hour</option>
+                        </select>
+                    </div>
+                </div>
+                <canvas id="energyChart"></canvas>
+                <div class="chart-stats">
+                    <div class="stat">
+                        <span class="label">Current</span>
+                        <span class="value" id="currentPower">0 kW</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Peak Today</span>
+                        <span class="value" id="peakPower">0 kW</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Avg Load</span>
+                        <span class="value" id="avgPower">0 kW</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Load Gauges -->
+            <div class="panel panel-medium">
+                <div class="panel-header">
+                    <h2>System Load Status</h2>
+                </div>
+                <div class="gauges-grid">
+                    <div class="gauge-container">
+                        <canvas id="hvacGauge"></canvas>
+                        <div class="gauge-label">HVAC Load</div>
+                        <div class="gauge-value" id="hvacValue">0%</div>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="lightingGauge"></canvas>
+                        <div class="gauge-label">Lighting Load</div>
+                        <div class="gauge-value" id="lightingValue">0%</div>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="equipmentGauge"></canvas>
+                        <div class="gauge-label">Equipment Load</div>
+                        <div class="gauge-value" id="equipmentValue">0%</div>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="occupancyGauge"></canvas>
+                        <div class="gauge-label">Occupancy</div>
+                        <div class="gauge-value" id="occupancyValue">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consumption Breakdown -->
+            <div class="panel panel-medium">
+                <div class="panel-header">
+                    <h2>Energy Distribution by System</h2>
+                    <select id="distributionView" class="range-select">
+                        <option value="pie">Pie Chart</option>
+                        <option value="bar">Bar Chart</option>
+                    </select>
+                </div>
+                <canvas id="distributionChart"></canvas>
+                <div class="distribution-legend" id="distributionLegend"></div>
+            </div>
+
+            <!-- HVAC System Details -->
+            <div class="panel panel-medium">
+                <div class="panel-header">
+                    <h2>HVAC System Monitor</h2>
+                </div>
+                <div class="hvac-grid">
+                    <div class="hvac-metric">
+                        <span class="metric-icon">🌡️</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Temperature</span>
+                            <span class="metric-value" id="hvacTemp">0°C</span>
+                        </div>
+                    </div>
+                    <div class="hvac-metric">
+                        <span class="metric-icon">💧</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Humidity</span>
+                            <span class="metric-value" id="hvacHumidity">0%</span>
+                        </div>
+                    </div>
+                    <div class="hvac-metric">
+                        <span class="metric-icon">🌀</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Airflow</span>
+                            <span class="metric-value" id="hvacAirflow">0 CFM</span>
+                        </div>
+                    </div>
+                    <div class="hvac-metric">
+                        <span class="metric-icon">⚡</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Power Draw</span>
+                            <span class="metric-value" id="hvacPower">0 kW</span>
+                        </div>
+                    </div>
+                    <div class="hvac-metric">
+                        <span class="metric-icon">🔧</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Units Active</span>
+                            <span class="metric-value" id="hvacUnits">0/0</span>
+                        </div>
+                    </div>
+                    <div class="hvac-metric">
+                        <span class="metric-icon">⚙️</span>
+                        <div class="metric-info">
+                            <span class="metric-label">Efficiency</span>
+                            <span class="metric-value" id="hvacEfficiency">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Occupancy Heatmap -->
+            <div class="panel panel-medium">
+                <div class="panel-header">
+                    <h2>Occupancy Heatmap</h2>
+                    <div class="heatmap-legend">
+                        <span class="legend-item"><span class="color-box low"></span>Low</span>
+                        <span class="legend-item"><span class="color-box medium"></span>Medium</span>
+                        <span class="legend-item"><span class="color-box high"></span>High</span>
+                    </div>
+                </div>
+                <div class="heatmap-container" id="occupancyHeatmap"></div>
+                <div class="occupancy-stats">
+                    <div class="stat">
+                        <span class="label">Total Occupants</span>
+                        <span class="value" id="totalOccupants">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Capacity</span>
+                        <span class="value" id="buildingCapacity">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Utilization</span>
+                        <span class="value" id="utilizationRate">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Logs -->
+            <div class="panel panel-large">
+                <div class="panel-header">
+                    <h2>Maintenance & Equipment Status</h2>
+                    <div class="panel-actions">
+                        <input type="text" id="maintenanceSearch" placeholder="Search logs..." class="search-input">
+                        <select id="maintenanceFilter" class="range-select">
+                            <option value="all">All Status</option>
+                            <option value="critical">Critical</option>
+                            <option value="warning">Warning</option>
+                            <option value="maintenance">Scheduled</option>
+                            <option value="operational">Operational</option>
+                        </select>
+                        <select id="costFilter" class="range-select">
+                            <option value="all">All Costs</option>
+                            <option value="high">High (>$5000)</option>
+                            <option value="medium">Medium ($1000-$5000)</option>
+                            <option value="low">Low (<$1000)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="maintenance-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('timestamp')">Timestamp <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable('building')">Building <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable('system')">System <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable('device')">Device ID <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable('status')">Status <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable('description')">Description <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable('cost')">Cost <span class="sort-icon">↕</span></th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenanceTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div class="pagination">
+                        <button id="prevPage" class="page-btn">← Prev</button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button id="nextPage" class="page-btn">Next →</button>
+                    </div>
+                    <div class="table-stats">
+                        <span>Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> records</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Analysis -->
+            <div class="panel panel-medium">
+                <div class="panel-header">
+                    <h2>Cost Analysis</h2>
+                    <select id="costPeriod" class="range-select">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                    </select>
+                </div>
+                <canvas id="costChart"></canvas>
+                <div class="cost-summary">
+                    <div class="cost-item">
+                        <span class="label">Energy Cost</span>
+                        <span class="value" id="energyCost">$0</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="label">Maintenance</span>
+                        <span class="value" id="maintenanceCost">$0</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="label">Total</span>
+                        <span class="value highlight" id="totalCost">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment Status -->
+            <div class="panel panel-medium">
+                <div class="panel-header">
+                    <h2>Equipment Health Overview</h2>
+                </div>
+                <div class="equipment-status">
+                    <div class="status-card operational">
+                        <div class="status-count" id="operationalCount">0</div>
+                        <div class="status-label">Operational</div>
+                    </div>
+                    <div class="status-card warning">
+                        <div class="status-count" id="warningCount">0</div>
+                        <div class="status-label">Warning</div>
+                    </div>
+                    <div class="status-card critical">
+                        <div class="status-count" id="criticalCount">0</div>
+                        <div class="status-label">Critical</div>
+                    </div>
+                    <div class="status-card maintenance">
+                        <div class="status-count" id="maintenanceCount">0</div>
+                        <div class="status-label">Maintenance</div>
+                    </div>
+                </div>
+                <canvas id="equipmentTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Alert Modal -->
+        <div id="alertModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>System Alerts</h2>
+                    <button class="close-btn" onclick="closeAlertModal()">×</button>
+                </div>
+                <div class="modal-body" id="alertsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data-simulator.js"></script>
+    <script src="js/chart-manager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
