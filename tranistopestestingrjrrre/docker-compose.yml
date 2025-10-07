@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  transit-dashboard:
+    build: .
+    container_name: transit-operations-dashboard
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    networks:
+      - transit-network
+
+networks:
+  transit-network:
+    driver: bridge
