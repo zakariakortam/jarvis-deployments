@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Dashboard - Factory Monitoring System</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h1>Industrial Monitoring Dashboard</h1>
+            <p class="header-subtitle">Real-Time Factory Equipment & Sensor Analytics</p>
+        </div>
+        <div class="header-right">
+            <div class="system-status">
+                <span class="status-indicator"></span>
+                <span>System Active</span>
+            </div>
+            <div class="last-update">
+                <small id="lastUpdate">Updating...</small>
+            </div>
+            <button id="refreshBtn" class="btn-secondary">
+                Refresh
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="dashboard-container">
+        <!-- KPI Summary Cards -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Equipment</div>
+                <div class="kpi-value" id="totalEquipment">--</div>
+                <div class="kpi-change">
+                    <span id="operationalEquipment">--</span> operational
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Active Sensors</div>
+                <div class="kpi-value" id="totalSensors">--</div>
+                <div class="kpi-change">
+                    <span id="criticalSensors">--</span> critical alerts
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Power Consumption</div>
+                <div class="kpi-value" id="totalPower">-- kW</div>
+                <div class="kpi-change">Total factory load</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Production Rate</div>
+                <div class="kpi-value" id="totalThroughput">--</div>
+                <div class="kpi-change">units per hour</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Avg Efficiency</div>
+                <div class="kpi-value" id="avgEfficiency">--%</div>
+                <div class="kpi-change">Overall equipment effectiveness</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Warning Sensors</div>
+                <div class="kpi-value" id="warningSensors">--</div>
+                <div class="kpi-change">Requires attention</div>
+            </div>
+        </section>
+
+        <!-- Performance Gauges -->
+        <section class="gauges-grid">
+            <div class="gauge-container">
+                <canvas id="oeeGauge"></canvas>
+            </div>
+            <div class="gauge-container">
+                <canvas id="healthGauge"></canvas>
+            </div>
+            <div class="gauge-container">
+                <canvas id="uptimeGauge"></canvas>
+            </div>
+            <div class="gauge-container">
+                <canvas id="throughputGauge"></canvas>
+            </div>
+        </section>
+
+        <!-- Real-Time Charts -->
+        <section class="charts-grid">
+            <div class="chart-container">
+                <canvas id="tempChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="vibChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="powerChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="voltageChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Equipment Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2 class="table-title">Equipment Status</h2>
+                <div class="table-controls">
+                    <div class="filter-group">
+                        <label class="filter-label">Zone:</label>
+                        <select id="zoneFilter">
+                            <option value="all">All Zones</option>
+                            <option value="Assembly Line A">Assembly Line A</option>
+                            <option value="Assembly Line B">Assembly Line B</option>
+                            <option value="Welding Station">Welding Station</option>
+                            <option value="Paint Booth">Paint Booth</option>
+                            <option value="Quality Control">Quality Control</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Material Handler">Material Handler</option>
+                            <option value="Press Shop">Press Shop</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status:</label>
+                        <select id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="operational">Operational</option>
+                            <option value="warning">Warning</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search equipment...">
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table" id="equipmentTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Equipment Name</th>
+                            <th data-sort="zone">Zone</th>
+                            <th data-sort="status">Status</th>
+                            <th data-sort="efficiency">Efficiency</th>
+                            <th data-sort="uptime">Uptime</th>
+                            <th data-sort="throughput">Throughput</th>
+                            <th data-sort="sensors">Sensors</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="no-data">Loading equipment data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sensor Alerts Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2 class="table-title">Sensor Alerts (Warning & Critical)</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table" id="sensorTable">
+                    <thead>
+                        <tr>
+                            <th>Sensor ID</th>
+                            <th>Equipment</th>
+                            <th>Type</th>
+                            <th>Current Value</th>
+                            <th>Status</th>
+                            <th>Last Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="no-data">Loading sensor data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Critical Alerts Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2 class="table-title">Critical Alerts</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table" id="alertsTable">
+                    <thead>
+                        <tr>
+                            <th>Equipment</th>
+                            <th>Sensor Type</th>
+                            <th>Value</th>
+                            <th>Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="no-data">No critical alerts</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript Dependencies -->
+    <script src="src/sensorEngine.js"></script>
+    <script src="src/chartEngine.js"></script>
+    <script src="src/dashboard.js"></script>
+
+    <!-- Update last update timestamp -->
+    <script>
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent =
+                'Last updated: ' + now.toLocaleTimeString();
+        }, 1000);
+    </script>
+</body>
+</html>
