@@ -1,0 +1,97 @@
+{
+  "application": {
+    "name": "Warehouse Management System",
+    "version": "1.0.0",
+    "environment": "development"
+  },
+  "simulation": {
+    "productCount": 300,
+    "shipmentCount": 150,
+    "supplierCount": 5,
+    "categories": ["Electronics", "Furniture", "Clothing", "Food", "Tools"],
+    "updateIntervals": {
+      "stockChanges": 2000,
+      "shipmentUpdates": 3000,
+      "newOrders": 5000,
+      "historicalData": 10000,
+      "uiRefresh": 2000
+    }
+  },
+  "inventory": {
+    "minStockLevel": 10,
+    "maxStockLevel": 200,
+    "minReorderPoint": 20,
+    "maxReorderPoint": 70,
+    "reorderMultiplier": 4,
+    "priceRange": {
+      "min": 10,
+      "max": 510
+    }
+  },
+  "orders": {
+    "minQuantity": 10,
+    "maxQuantity": 110,
+    "minFulfillmentHours": 12,
+    "maxFulfillmentHours": 132,
+    "orderHistoryHours": 24,
+    "stockMovementDays": 30
+  },
+  "suppliers": [
+    {
+      "id": "SUP001",
+      "name": "Global Electronics Ltd",
+      "performanceScore": 95,
+      "avgDeliveryTime": 48
+    },
+    {
+      "id": "SUP002",
+      "name": "FastShip Industries",
+      "performanceScore": 88,
+      "avgDeliveryTime": 72
+    },
+    {
+      "id": "SUP003",
+      "name": "Premium Goods Co",
+      "performanceScore": 92,
+      "avgDeliveryTime": 60
+    },
+    {
+      "id": "SUP004",
+      "name": "Quick Supply Partners",
+      "performanceScore": 85,
+      "avgDeliveryTime": 96
+    },
+    {
+      "id": "SUP005",
+      "name": "Reliable Wholesale Inc",
+      "performanceScore": 90,
+      "avgDeliveryTime": 54
+    }
+  ],
+  "kpis": {
+    "maxInventoryValue": 5000000,
+    "optimalFillRate": 85,
+    "maxFulfillmentTime": 120,
+    "alertThresholds": {
+      "fillRate": {
+        "critical": 70,
+        "warning": 85
+      },
+      "fulfillmentTime": {
+        "critical": 96,
+        "warning": 72
+      },
+      "reorderAlerts": {
+        "critical": 50,
+        "warning": 20
+      }
+    }
+  },
+  "ui": {
+    "updateCounterEnabled": true,
+    "alertsEnabled": true,
+    "exportEnabled": true,
+    "theme": "professional",
+    "chartAnimations": false
+  }
+}

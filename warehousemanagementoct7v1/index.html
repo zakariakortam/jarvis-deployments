@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Management System</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Warehouse Management System</h1>
+            <div class="header-stats">
+                <div class="stat-badge">
+                    <span class="stat-label">Live Updates</span>
+                    <span class="stat-value" id="updateCounter">0</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">System Time</span>
+                    <span class="stat-value" id="systemTime"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Dashboard -->
+        <section class="kpi-section">
+            <div class="kpi-card">
+                <div class="kpi-header">Total Inventory Value</div>
+                <div class="kpi-value" id="totalValue">$0</div>
+                <canvas id="valueGauge" width="200" height="100"></canvas>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">Fill Rate</div>
+                <div class="kpi-value" id="fillRate">0%</div>
+                <canvas id="fillRateGauge" width="200" height="100"></canvas>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">Avg Fulfillment Time</div>
+                <div class="kpi-value" id="avgFulfillment">0h</div>
+                <canvas id="fulfillmentGauge" width="200" height="100"></canvas>
+            </div>
+            <div class="kpi-card alert">
+                <div class="kpi-header">Reorder Alerts</div>
+                <div class="kpi-value" id="reorderAlerts">0</div>
+                <div class="alert-indicator" id="alertIndicator"></div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-container">
+                <h3>Inventory Levels by Category</h3>
+                <canvas id="inventoryChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Order Flow (Last 24h)</h3>
+                <canvas id="orderFlowChart"></canvas>
+            </div>
+        </section>
+
+        <section class="charts-section">
+            <div class="chart-container">
+                <h3>Stock Movement Trends</h3>
+                <canvas id="stockMovementChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Supplier Performance</h3>
+                <canvas id="supplierChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Products Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <h3>Product Inventory</h3>
+                <div class="table-controls">
+                    <input type="text" id="productSearch" placeholder="Search products..." class="search-input">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Food">Food</option>
+                        <option value="Tools">Tools</option>
+                    </select>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="productId">Product ID ↕</th>
+                            <th data-sort="name">Name ↕</th>
+                            <th data-sort="category">Category ↕</th>
+                            <th data-sort="stockLevel">Stock Level ↕</th>
+                            <th data-sort="reorderPoint">Reorder Point ↕</th>
+                            <th data-sort="status">Status ↕</th>
+                            <th data-sort="supplier">Supplier ↕</th>
+                            <th data-sort="lastUpdated">Last Updated ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Shipments Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <h3>Active Shipments</h3>
+                <div class="table-controls">
+                    <input type="text" id="shipmentSearch" placeholder="Search shipments..." class="search-input">
+                    <select id="shipmentStatusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="shipmentsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="orderId">Order ID ↕</th>
+                            <th data-sort="productId">Product ID ↕</th>
+                            <th data-sort="quantity">Quantity ↕</th>
+                            <th data-sort="status">Status ↕</th>
+                            <th data-sort="supplier">Supplier ↕</th>
+                            <th data-sort="orderDate">Order Date ↕</th>
+                            <th data-sort="estimatedDelivery">Est. Delivery ↕</th>
+                            <th data-sort="fulfillmentTime">Fulfillment Time ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shipmentsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="src/data-simulator.js"></script>
+    <script src="src/charts.js"></script>
+    <script src="src/tables.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>
