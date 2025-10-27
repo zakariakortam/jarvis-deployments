@@ -1,0 +1,37 @@
+FROM node:20-alpine
+
+# Install dependencies for node-gyp and native modules
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy project files
+COPY . .
+
+# Enable CORS for Vite dev server (create/overwrite config)
+RUN echo 'import { defineConfig } from "vite"\n\
+export default defineConfig({\n\
+  server: {\n\
+    host: "0.0.0.0",\n\
+    port: 5000,\n\
+    cors: true,\n\
+    strictPort: true\n\
+  }\n\
+})' > vite.config.js || true
+
+# Expose port
+EXPOSE 5000
+
+# Set environment variables
+ENV PORT=5000
+ENV HOST=0.0.0.0
+ENV NODE_ENV=development
+
+# Run command - using JSON format to avoid shell issues
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5000"]
