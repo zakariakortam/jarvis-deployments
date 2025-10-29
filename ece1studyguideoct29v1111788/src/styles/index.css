@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: theme('colors.gray.200');
+  }
+
+  .dark * {
+    border-color: theme('colors.gray.700');
+  }
+
+  body {
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* KaTeX overrides for dark mode */
+.dark .katex {
+  color: inherit;
+}
+
+.dark .katex .mord,
+.dark .katex .mop,
+.dark .katex .mrel,
+.dark .katex .mopen,
+.dark .katex .mclose,
+.dark .katex .mpunct {
+  color: inherit;
+}
+
+/* Circuit diagram styles */
+.circuit-element {
+  @apply stroke-gray-900 dark:stroke-gray-100 fill-none;
+  stroke-width: 2;
+}
+
+.circuit-node {
+  @apply fill-primary-600;
+}
+
+.circuit-label {
+  @apply fill-gray-700 dark:fill-gray-300;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Bode plot styles */
+.bode-grid {
+  @apply stroke-gray-300 dark:stroke-gray-600;
+  stroke-width: 1;
+}
+
+.bode-axis {
+  @apply stroke-gray-700 dark:stroke-gray-300;
+  stroke-width: 2;
+}
+
+.bode-plot-line {
+  @apply stroke-primary-600;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Math equation highlighting */
+.equation-step {
+  @apply bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-500 pl-4 py-2 my-2 rounded-r-lg;
+}
+
+.equation-result {
+  @apply bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 pl-4 py-2 my-2 rounded-r-lg font-semibold;
+}
+
+/* Loading spinner */
+.spinner {
+  border: 3px solid rgba(59, 130, 246, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    @apply bg-white text-black;
+  }
+
+  .card {
+    @apply border border-gray-300 shadow-none;
+    page-break-inside: avoid;
+  }
+}
