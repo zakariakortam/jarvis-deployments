@@ -1,0 +1,113 @@
+.circuit-visualizer {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.circuit-canvas {
+  width: 100%;
+  height: 500px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  cursor: crosshair;
+  position: relative;
+}
+
+.dark .circuit-canvas {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+.component-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.component-btn {
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.component-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.component-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.control-btn {
+  padding: 0.5rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.control-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.circuit-info {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.circuit-info h4 {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.circuit-info pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .circuit-visualizer {
+    padding: 1rem;
+  }
+
+  .circuit-canvas {
+    height: 400px;
+  }
+
+  .component-toolbar {
+    gap: 0.25rem;
+  }
+
+  .component-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
