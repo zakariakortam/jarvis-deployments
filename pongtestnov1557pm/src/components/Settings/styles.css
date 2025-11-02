@@ -1,0 +1,299 @@
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.settings-panel {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.dark .settings-panel {
+  background: #1e293b;
+}
+
+.settings-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0ea5e9;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.dark .settings-title {
+  color: #38bdf8;
+}
+
+.settings-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+}
+
+.dark .settings-score {
+  background: #0f172a;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dark .score-label {
+  color: #94a3b8;
+}
+
+.score-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #0ea5e9;
+  line-height: 1;
+}
+
+.dark .score-value {
+  color: #38bdf8;
+}
+
+.score-divider {
+  font-size: 2rem;
+  color: #cbd5e1;
+}
+
+.dark .score-divider {
+  color: #475569;
+}
+
+.game-result {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.result-winner {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #22c55e;
+  margin: 0;
+}
+
+.result-loser {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0;
+}
+
+.settings-section {
+  margin-bottom: 1.5rem;
+}
+
+.settings-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 1rem;
+}
+
+.dark .settings-section-title {
+  color: #cbd5e1;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.difficulty-button {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dark .difficulty-button {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.difficulty-button:hover {
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+}
+
+.dark .difficulty-button:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.difficulty-button.active {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: white;
+}
+
+.dark .difficulty-button.active {
+  background: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.dark .settings-option {
+  background: #0f172a;
+}
+
+.settings-option span {
+  font-weight: 500;
+  color: #334155;
+}
+
+.dark .settings-option span {
+  color: #cbd5e1;
+}
+
+.toggle-button {
+  position: relative;
+  width: 3rem;
+  height: 1.5rem;
+  background: #cbd5e1;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dark .toggle-button {
+  background: #475569;
+}
+
+.toggle-button.active {
+  background: #0ea5e9;
+}
+
+.dark .toggle-button.active {
+  background: #38bdf8;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: white;
+  border-radius: 9999px;
+  transition: transform 0.3s;
+}
+
+.toggle-button.active .toggle-slider {
+  transform: translateX(1.5rem);
+}
+
+.settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.settings-button {
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.settings-button-primary {
+  background: #0ea5e9;
+  color: white;
+}
+
+.settings-button-primary:hover {
+  background: #0284c7;
+}
+
+.settings-button-secondary {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.dark .settings-button-secondary {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.settings-button-secondary:hover {
+  background: #e2e8f0;
+}
+
+.dark .settings-button-secondary:hover {
+  background: #475569;
+}
+
+@media (max-width: 640px) {
+  .settings-panel {
+    padding: 1.5rem;
+  }
+
+  .settings-title {
+    font-size: 1.5rem;
+  }
+
+  .score-value {
+    font-size: 2rem;
+  }
+
+  .difficulty-buttons {
+    flex-direction: column;
+  }
+}
