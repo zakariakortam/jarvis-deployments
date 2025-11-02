@@ -40,7 +40,7 @@ const Dashboard = () => {
           return (
             <div key={key} className="card">
               <h3 className="text-lg font-semibold mb-2">{param.name}</h3>
-              <p className={\`text-4xl font-bold \${getStatusColor(key, value)}\`}>
+              <p className={`text-4xl font-bold ${getStatusColor(key, value)}`}>
                 {value.toFixed(2)} {param.unit}
               </p>
               <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
