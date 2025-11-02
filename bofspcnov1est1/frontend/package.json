@@ -1,0 +1,55 @@
+{
+  "name": "bof-spc-monitor",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Statistical Process Control System for Basic Oxygen Furnace Operations",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port $PORT --host",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .js,.jsx",
+    "format": "prettier --write 'src/**/*.{js,jsx,css}'"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "@tanstack/react-query": "^5.28.0",
+    "zustand": "^4.5.2",
+    "axios": "^1.6.7",
+    "socket.io-client": "^4.6.1",
+    "framer-motion": "^11.0.8",
+    "@headlessui/react": "^1.7.18",
+    "react-hook-form": "^7.51.0",
+    "zod": "^3.22.4",
+    "date-fns": "^3.3.1",
+    "recharts": "^2.12.2",
+    "lucide-react": "^0.344.0",
+    "react-hot-toast": "^2.4.1",
+    "papaparse": "^5.4.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2"
+  },
+  "devDependencies": {
+    "vite": "^5.1.4",
+    "@vitejs/plugin-react": "^4.2.1",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.18",
+    "postcss": "^8.4.35",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.2.5",
+    "vitest": "^1.3.1",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/jest-dom": "^6.4.2",
+    "vite-plugin-compression2": "^0.11.0",
+    "rollup-plugin-visualizer": "^5.12.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
