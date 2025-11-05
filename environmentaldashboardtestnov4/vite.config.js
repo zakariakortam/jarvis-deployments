@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  // CRITICAL: Use relative paths for proper asset loading in deployment
+  base: './',
+  
   plugins: [react()],
   build: {
     rollupOptions: {
@@ -14,7 +17,8 @@ export default defineConfig({
       }
     },
     sourcemap: true,
-    minify: 'terser'
+    minify: 'terser',
+    outDir: 'dist'
   },
   server: {
     port: process.env.PORT || 3000,
