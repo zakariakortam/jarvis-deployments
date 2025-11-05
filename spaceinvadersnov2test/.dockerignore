@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+
+# Environment and config
+.env*
+!.env.example
+.envrc
+.venv/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs and cache
+*.log
+.cache/
+.tmp/
+.temp/
+.eslintcache
+.parcel-cache/
+.nyc_output/
+coverage/
+
+# Version control
+.git/
+.gitignore
+.hg/
+.svn/
+
+# Documentation and tests (exclude from build)
+*.md
+!README.md
+docs/
+documentation/
+tests/
+test/
+*.test.*
+*.spec.*
+__tests__/
+cypress/
+.storybook/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Runtime
+.pid
+*.pid
+*.seed
+*.pid.lock
