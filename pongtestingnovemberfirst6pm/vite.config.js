@@ -4,6 +4,7 @@ import { compression } from 'vite-plugin-compression2'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
     compression({ algorithm: 'gzip' }),
