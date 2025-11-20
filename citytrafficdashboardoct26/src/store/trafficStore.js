@@ -1,170 +1,61 @@
-import { create } from 'zustand'
-import {
-  generateSensorNetwork,
-  updateSensorData,
-  generateEvents,
-  calculateMetrics,
-  createHistoricalDataPoint
-} from '../services/trafficSimulator'
-
-const MAX_HISTORY_POINTS = 50
+import { create } from 'zustand';
 
 const useTrafficStore = create((set, get) => ({
-  // State
   sensors: [],
+  vehicles: [],
   events: [],
-  metrics: null,
-  historicalData: [],
-  isSimulationRunning: false,
-  selectedSensor: null,
-  selectedZone: null,
-  timeOfDay: new Date(),
+  historicalData: {
+    speed: [],
+    congestion: [],
+    emissions: [],
+    timestamps: []
+  },
+  alerts: [],
   darkMode: false,
+  selectedSensor: null,
+  filters: {
+    eventType: 'all',
+    severity: 'all',
+    searchTerm: ''
+  },
+  stats: {
+    avgSpeed: 0,
+    totalVehicles: 0,
+    avgCongestion: 0,
+    totalEmissions: 0,
+    activeAlerts: 0
+  },
 
   // Actions
-  initializeSimulation: () => {
-    const sensors = generateSensorNetwork(300)
-    const metrics = calculateMetrics(sensors)
-    const historicalDataPoint = createHistoricalDataPoint(metrics, Date.now())
-
-    set({
-      sensors,
-      metrics,
-      historicalData: [historicalDataPoint],
-      isSimulationRunning: true
-    })
-  },
-
-  updateSimulation: () => {
-    const { sensors, events, timeOfDay, historicalData } = get()
-
-    // Update sensor data
-    const updatedSensors = updateSensorData(sensors, timeOfDay)
-
-    // Generate/update events
-    const updatedEvents = generateEvents(updatedSensors, events)
-
-    // Calculate new metrics
-    const newMetrics = calculateMetrics(updatedSensors)
-
-    // Update historical data
-    const newHistoricalPoint = createHistoricalDataPoint(newMetrics, Date.now())
-    const updatedHistory = [...historicalData, newHistoricalPoint].slice(-MAX_HISTORY_POINTS)
-
-    // Update time
-    const newTime = new Date(timeOfDay.getTime() + 60000) // Advance 1 minute
-
-    set({
-      sensors: updatedSensors,
-      events: updatedEvents,
-      metrics: newMetrics,
-      historicalData: updatedHistory,
-      timeOfDay: newTime
-    })
-  },
-
-  startSimulation: () => {
-    set({ isSimulationRunning: true })
-  },
-
-  pauseSimulation: () => {
-    set({ isSimulationRunning: false })
-  },
-
-  resetSimulation: () => {
-    const sensors = generateSensorNetwork(300)
-    const metrics = calculateMetrics(sensors)
-    const historicalDataPoint = createHistoricalDataPoint(metrics, Date.now())
-
-    set({
-      sensors,
-      events: [],
-      metrics,
-      historicalData: [historicalDataPoint],
-      timeOfDay: new Date(),
-      selectedSensor: null,
-      selectedZone: null
-    })
-  },
-
-  selectSensor: (sensorId) => {
-    const { sensors } = get()
-    const sensor = sensors.find(s => s.id === sensorId)
-    set({ selectedSensor: sensor })
-  },
-
-  deselectSensor: () => {
-    set({ selectedSensor: null })
-  },
-
-  selectZone: (zone) => {
-    set({ selectedZone: zone })
-  },
-
-  deselectZone: () => {
-    set({ selectedZone: null })
-  },
-
-  toggleDarkMode: () => {
-    const { darkMode } = get()
-    set({ darkMode: !darkMode })
-
-    // Update document class for Tailwind
-    if (!darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
+  setSensors: (sensors) => set({ sensors }),
+  setVehicles: (vehicles) => set({ vehicles }),
+  addEvent: (event) => set((state) => ({
+    events: [event, ...state.events].slice(0, 500) // Keep last 500 events
+  })),
+  addAlert: (alert) => set((state) => ({
+    alerts: [alert, ...state.alerts].slice(0, 50)
+  })),
+  dismissAlert: (id) => set((state) => ({
+    alerts: state.alerts.filter(a => a.id !== id)
+  })),
+  updateHistoricalData: (data) => set((state) => ({
+    historicalData: {
+      speed: [...state.historicalData.speed, data.speed].slice(-30),
+      congestion: [...state.historicalData.congestion, data.congestion].slice(-30),
+      emissions: [...state.historicalData.emissions, data.emissions].slice(-30),
+      timestamps: [...state.historicalData.timestamps, data.timestamp].slice(-30)
     }
-  },
+  })),
+  updateStats: (stats) => set({ stats }),
+  toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+  setSelectedSensor: (sensor) => set({ selectedSensor: sensor }),
+  setFilters: (filters) => set((state) => ({
+    filters: { ...state.filters, ...filters }
+  })),
+  clearEvents: () => set({ events: [] }),
+  updateSensor: (id, updates) => set((state) => ({
+    sensors: state.sensors.map(s => s.id === id ? { ...s, ...updates } : s)
+  }))
+}));
 
-  setDarkMode: (enabled) => {
-    set({ darkMode: enabled })
-    if (enabled) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  },
-
-  // Computed getters
-  getFilteredSensors: (zone = null) => {
-    const { sensors } = get()
-    if (!zone) return sensors
-    return sensors.filter(s => s.zone === zone)
-  },
-
-  getFilteredEvents: (type = null, severity = null) => {
-    const { events } = get()
-    let filtered = events
-
-    if (type) {
-      filtered = filtered.filter(e => e.type === type)
-    }
-
-    if (severity) {
-      filtered = filtered.filter(e => e.severity === severity)
-    }
-
-    return filtered
-  },
-
-  getCongestionLevel: () => {
-    const { metrics } = get()
-    if (!metrics) return 'low'
-
-    const congestion = parseFloat(metrics.avgCongestion)
-    if (congestion < 30) return 'low'
-    if (congestion < 60) return 'medium'
-    return 'high'
-  },
-
-  getZoneStats: (zone) => {
-    const { metrics } = get()
-    if (!metrics || !metrics.zoneMetrics || !metrics.zoneMetrics[zone]) {
-      return null
-    }
-    return metrics.zoneMetrics[zone]
-  }
-}))
-
-export default useTrafficStore
+export default useTrafficStore;
