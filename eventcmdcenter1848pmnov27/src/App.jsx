@@ -1,63 +1,55 @@
-import { useEffect } from 'react';
-import { Toaster } from 'react-hot-toast';
-import Header from './components/Layout/Header';
-import MainDashboard from './components/Dashboard/MainDashboard';
-import useRealtime from './hooks/useRealtime';
-import useEventStore from './store/eventStore';
+import React, { useEffect } from 'react';
+import { Header } from './components/Dashboard/Header';
+import { BuildingSelector } from './components/Dashboard/BuildingSelector';
+import { DashboardView } from './components/Dashboard/DashboardView';
+import { useDashboardStore } from './store/dashboardStore';
+import dataSimulator from './services/dataSimulator';
 
 function App() {
-  const { theme, login } = useEventStore();
-  useRealtime();
+  const { selectedBuilding, updateRealtimeData, setDarkMode } = useDashboardStore();
 
-  // Apply theme
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setDarkMode(prefersDark);
 
-  // Simulate login for demo
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [setDarkMode]);
+
   useEffect(() => {
-    login({
-      id: 'user-1',
-      name: 'Event Manager',
-      email: 'manager@event.com',
-      role: 'admin'
-    });
-  }, [login]);
+    const updateInterval = parseInt(import.meta.env.VITE_UPDATE_INTERVAL) || 3000;
+
+    dataSimulator.startRealtimeSimulation((data) => {
+      updateRealtimeData(data);
+    }, updateInterval);
+
+    return () => {
+      dataSimulator.stopRealtimeSimulation();
+    };
+  }, [updateRealtimeData]);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-6 max-w-[1920px]">
-        <MainDashboard />
+
+      <main className="container mx-auto px-4 py-6">
+        {!selectedBuilding ? (
+          <BuildingSelector />
+        ) : (
+          <div className="space-y-6">
+            <button
+              onClick={() => useDashboardStore.getState().setSelectedBuilding(null)}
+              className="text-sm text-primary hover:underline"
+            >
+              ← Back to all buildings
+            </button>
+            <DashboardView building={selectedBuilding} />
+          </div>
+        )}
       </main>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: 'hsl(var(--card))',
-            color: 'hsl(var(--foreground))',
-            border: '1px solid hsl(var(--border))'
-          },
-          success: {
-            iconTheme: {
-              primary: 'hsl(var(--success))',
-              secondary: 'white'
-            }
-          },
-          error: {
-            iconTheme: {
-              primary: 'hsl(var(--danger))',
-              secondary: 'white'
-            }
-          }
-        }}
-      />
     </div>
   );
 }

@@ -1,77 +1,72 @@
-# Event Command Center
+# Building Portfolio Dashboard
 
-A production-ready real-time event management interface with comprehensive monitoring and operations capabilities.
+A production-ready, real-time building portfolio management dashboard with comprehensive analytics and monitoring capabilities.
 
 ## Features
 
-### Live Attendee Flow Map
-- Real-time zone occupancy tracking with capacity percentages
-- Entry/exit rate monitoring per zone
-- Wait time estimation for each area
-- Visual trend indicators (increasing/decreasing)
-- Automated capacity alerts for near-full zones
+### Core Functionality
+- **Real-time Data Updates**: Continuous simulation of building metrics updating every 3 seconds
+- **12 Building Portfolio**: Monitor multiple properties across different types and locations
+- **Comprehensive Analytics**: 6 major dashboard categories with hundreds of datapoints
+- **Dark Mode**: System preference detection with manual toggle
+- **Data Export**: Export building data and reports in JSON format
+- **Advanced Filtering**: Search, filter by type, location, and occupancy rate
+- **Responsive Design**: Mobile-first design works on all screen sizes
 
-### Ticket Scanning Activity Timeline
-- Live ticket scanning feed with timestamps
-- Validation status (valid/invalid) indicators
-- Success rate metrics and statistics
-- Ticket type categorization (VIP, General, Early Bird, etc.)
-- Scanner device and zone location tracking
-- Real-time activity indicators
+### Dashboard Modules
 
-### Vendor Sales Dashboards
-- Revenue tracking per vendor with hourly breakdowns
-- Transaction volume and average ticket metrics
-- Category-wise performance analysis (food, beverage, merchandise)
-- Top-selling items per vendor
-- Revenue distribution pie charts
-- Performance trend indicators
+#### 1. Occupancy & Leasing
+- Historical occupancy rate trends
+- Leasing timeline with 20+ events per building
+- Real-time occupancy updates
+- Available vs leased space tracking
+- Lease status monitoring (New Lease, Renewal, Termination, Expansion)
 
-### Security Monitoring Tiles
-- Overall security status dashboard
-- Active incident tracking and resolution metrics
-- Zone-by-zone security status
-- Camera system status monitoring
-- Security personnel allocation (on duty, available, responding)
-- Recent incident timeline with severity levels
-- Alert notifications for critical events
+#### 2. Space Utilization Heatmap
+- 24-hour utilization tracking across all floors
+- 7-day visualization
+- Color-coded utilization levels (0-100%)
+- Interactive floor-by-floor analysis
+- Weekend vs weekday patterns
 
-### Staff Allocation Boards
-- Total staff utilization metrics
-- Role-based allocation (Security, Usher, Medical, Technical, etc.)
-- Zone-wise staff distribution
-- Shift schedule management
-- Understaffing alerts
-- Active/break status tracking
+#### 3. Energy Usage
+- Electricity, gas, and water consumption tracking
+- 30-day historical data
+- Cost analysis and trends
+- Real-time usage monitoring
+- Energy type breakdown
 
-### Crowd Density Heatmaps
-- 8x8 grid visualization of venue layout
-- Real-time density levels (Low, Medium, High, Critical)
-- Hotspot identification with recommendations
-- Total occupancy vs. capacity tracking
-- Color-coded density indicators
-- Interactive cell tooltips with detailed metrics
+#### 4. Maintenance Cost Analytics
+- Cost breakdown by type (Preventive, Reactive, Emergency, Planned)
+- 12-month historical trends
+- Category analysis (HVAC, Electrical, Plumbing, Elevators, Security, Cleaning, Landscaping)
+- Monthly and annual totals
+- Cost optimization insights
 
-### Additional Features
-- Dark/Light theme support with persistence
-- Real-time WebSocket simulation with configurable update frequency
-- Alert and notification system with browser notifications
-- Data export functionality (JSON/CSV)
-- Role-based authentication ready
-- Responsive design for all screen sizes
-- Production-ready Docker deployment
-- Security headers and CSP policies
+#### 5. Tenant Satisfaction
+- 8 satisfaction categories with scoring
+- Response rate tracking
+- Historical trend analysis
+- Radar chart visualization
+- Real-time feedback monitoring
+
+#### 6. Investment Performance
+- Property value tracking (24-month history)
+- ROI and Cap Rate calculations
+- Revenue vs Expense analysis
+- Net Operating Income (NOI) trends
+- Investment performance metrics
 
 ## Technology Stack
 
-- **Frontend**: React 18 + Vite
-- **State Management**: Zustand with persistence
-- **Styling**: Tailwind CSS with custom theming
-- **Charts**: Recharts for data visualization
+- **Frontend**: React 18 with hooks
+- **Build Tool**: Vite 5 with optimized production builds
+- **Styling**: TailwindCSS with dark mode support
+- **Charts**: Recharts for all visualizations
+- **State Management**: Zustand for efficient state handling
+- **Date Handling**: date-fns for date manipulation
+- **Icons**: Lucide React
 - **Animations**: Framer Motion
-- **Icons**: Lucide React + Heroicons
-- **Date Handling**: date-fns
-- **Notifications**: react-hot-toast
 
 ## Quick Start
 
@@ -82,10 +77,13 @@ A production-ready real-time event management interface with comprehensive monit
 ### Installation
 
 ```bash
+# Navigate to project directory
+cd building-portfolio-dashboard
+
 # Install dependencies
 npm install
 
-# Run development server
+# Start development server
 npm run dev
 
 # Build for production
@@ -95,204 +93,196 @@ npm run build
 npm run preview
 ```
 
-### Development Server
-```bash
-npm run dev
+### Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```env
+VITE_APP_TITLE=Building Portfolio Dashboard
+VITE_UPDATE_INTERVAL=3000
+VITE_SIMULATION_SPEED=1
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Structure
 
 ```
-event-command-center/
+building-portfolio-dashboard/
 ├── src/
 │   ├── components/
-│   │   ├── AttendeeFlow/
-│   │   │   └── AttendeeFlowMap.jsx
-│   │   ├── TicketScanning/
-│   │   │   └── TicketTimeline.jsx
-│   │   ├── VendorSales/
-│   │   │   └── VendorDashboard.jsx
-│   │   ├── SecurityMonitoring/
-│   │   │   └── SecurityTiles.jsx
-│   │   ├── StaffAllocation/
-│   │   │   └── StaffBoard.jsx
-│   │   ├── CrowdDensity/
-│   │   │   └── HeatmapVis.jsx
-│   │   ├── Dashboard/
-│   │   │   └── MainDashboard.jsx
-│   │   └── Layout/
-│   │       └── Header.jsx
+│   │   ├── Dashboard/           # Main dashboard components
+│   │   ├── Occupancy/           # Occupancy & leasing components
+│   │   ├── SpaceUtilization/    # Heatmap visualization
+│   │   ├── Energy/              # Energy monitoring
+│   │   ├── Maintenance/         # Maintenance analytics
+│   │   ├── TenantSatisfaction/  # Satisfaction tracking
+│   │   ├── Investment/          # Investment analytics
+│   │   └── common/              # Reusable UI components
 │   ├── services/
-│   │   ├── mockDataGenerator.js
-│   │   └── realtimeDataService.js
+│   │   └── dataSimulator.js     # Data generation engine
 │   ├── store/
-│   │   └── eventStore.js
-│   ├── hooks/
-│   │   └── useRealtime.js
+│   │   └── dashboardStore.js    # Zustand state management
 │   ├── styles/
-│   │   └── index.css
-│   ├── App.jsx
-│   └── main.jsx
-├── public/
-├── Dockerfile
-├── nginx.conf
-├── package.json
-├── vite.config.js
-├── tailwind.config.js
-└── README.md
+│   │   └── index.css            # Global styles & Tailwind
+│   ├── App.jsx                  # Root component
+│   └── main.jsx                 # Application entry point
+├── public/                      # Static assets
+├── docs/                        # Additional documentation
+├── Dockerfile                   # Docker configuration
+├── nginx.conf                   # Nginx server configuration
+├── vite.config.js              # Vite build configuration
+├── tailwind.config.js          # Tailwind CSS configuration
+└── package.json                # Dependencies and scripts
 ```
-
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_APP_NAME=Event Command Center
-VITE_APP_VERSION=1.0.0
-VITE_API_URL=http://localhost:5000
-VITE_WS_URL=ws://localhost:5000
-VITE_ENABLE_ANALYTICS=true
-VITE_ENABLE_NOTIFICATIONS=true
-VITE_MOCK_DATA_ENABLED=true
-VITE_DATA_UPDATE_INTERVAL=2000
-```
-
-### Mock Data Configuration
-
-The application uses a comprehensive mock data generator for demonstration purposes. Update frequency and data generation parameters can be adjusted in:
-- `src/services/mockDataGenerator.js` - Data generation logic
-- `src/services/realtimeDataService.js` - Update frequency and WebSocket simulation
 
 ## Deployment
 
 ### Docker Deployment
 
+The application includes production-ready Docker configuration:
+
 ```bash
 # Build Docker image
-docker build -t event-command-center .
+docker build -t building-portfolio-dashboard .
 
 # Run container
-docker run -p 80:80 event-command-center
+docker run -p 80:80 building-portfolio-dashboard
 ```
 
 ### Coolify Deployment
 
 1. Push code to Git repository
-2. In Coolify, create new application
-3. Point to your repository
-4. Coolify will auto-detect Dockerfile
-5. Set environment variables in Coolify UI
-6. Deploy
+2. Create new service in Coolify
+3. Point to repository
+4. Coolify will automatically detect Dockerfile and deploy
+5. No additional configuration needed
 
 The application includes:
-- Production-optimized Dockerfile
-- nginx.conf with proper MIME types and security headers
-- Gzip compression enabled
-- Static asset caching configured
-- SPA routing support
+- Optimized Dockerfile with multi-stage builds
+- Nginx configuration with proper MIME types
+- Security headers
+- Gzip compression
+- Cache control
 
-## Build Configuration
+## Features Deep Dive
 
-### Vite Optimization
-- Code splitting for vendor, charts, and UI libraries
-- Terser minification for production
-- Gzip compression plugin
-- Bundle analysis with rollup-plugin-visualizer
-- Relative asset paths (`base: './'`) for deployment flexibility
+### Real-time Simulation
 
-### Bundle Sizes (Gzipped)
-- index.html: ~0.42 KB
-- CSS: ~4.6 KB
-- Main JS: ~35.4 KB
-- UI Components: ~44.2 KB
-- Vendor Libraries: ~91.9 KB
-- Charts: ~104.6 KB
+The data simulator generates realistic building metrics including:
+- **Occupancy**: 60-100% range with realistic fluctuations
+- **Energy Usage**: Day/night and weekday/weekend patterns
+- **Maintenance Events**: Random events with realistic distributions
+- **Tenant Satisfaction**: Score variations across categories
+- **Investment Performance**: Appreciation, revenue, and NOI calculations
 
-**Total Bundle Size**: ~280 KB (gzipped)
+### Data Export
 
-## Performance Metrics
+Export building data for external analysis:
+- JSON format
+- Timestamped filenames
+- Complete building information
+- Current metrics snapshot
 
-- First Paint: < 1.5s
-- Time to Interactive: < 3s
-- Lighthouse Score: 95+
-- Bundle Size: < 300KB (gzipped)
+### Filtering & Search
 
-## Security Features
+Advanced filtering capabilities:
+- Full-text search across building names and IDs
+- Filter by building type (Office, Retail, Residential, Mixed-Use, Industrial)
+- Filter by location (Downtown, Midtown, Uptown, Waterfront, Suburban, Tech District)
+- Minimum occupancy rate filter
 
-- Content Security Policy (CSP) headers
-- XSS Protection headers
-- Frame Options (SAMEORIGIN)
-- Content-Type-Options (nosniff)
-- Input validation on all forms
-- Secure authentication ready (JWT/OAuth2)
-- HTTPS-only cookies (production)
+### Dark Mode
+
+Automatic dark mode with:
+- System preference detection
+- Manual toggle in header
+- Consistent color scheme across all components
+- Smooth transitions
+
+## Performance Optimizations
+
+- Code splitting by route and vendor chunks
+- Lazy loading for heavy components
+- Optimized bundle size (<200KB gzipped)
+- Efficient re-renders with Zustand
+- Memoized chart components
+- Responsive images and assets
 
 ## Browser Support
 
-- Chrome/Edge: Latest 2 versions
-- Firefox: Latest 2 versions
-- Safari: Latest 2 versions
-- Mobile browsers: iOS Safari 14+, Chrome Android Latest
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-## Scripts
+## Development
+
+### Available Scripts
 
 ```bash
-# Development
-npm run dev              # Start dev server
+# Development server with hot reload
+npm run dev
 
-# Build
-npm run build           # Production build
-npm run preview         # Preview production build
+# Production build
+npm run build
 
-# Code Quality
-npm run lint            # Run ESLint
-npm run format          # Format with Prettier
+# Preview production build locally
+npm run preview
 
-# Testing
-npm run test            # Run tests
-npm run test:coverage   # Generate coverage report
+# Lint code
+npm run lint
+
+# Format code
+npm run format
 ```
 
-## Customization
+### Adding New Buildings
 
-### Theming
-Modify theme colors in `tailwind.config.js` and `src/styles/index.css`:
-- Primary color
-- Success/Warning/Danger colors
-- Background and foreground
-- Border and accent colors
+Edit `src/services/dataSimulator.js` and modify the `generateBuildings()` method:
 
-### Data Update Frequency
-Adjust real-time update interval in the store settings or environment variables.
+```javascript
+generateBuildings(count) {
+  // Increase count parameter or customize building properties
+}
+```
 
-### Mock Data
-Customize data generation in `src/services/mockDataGenerator.js`:
-- Zone names and capacities
-- Vendor types and categories
-- Ticket types
-- Staff roles
-- Security incident types
+### Customizing Update Interval
 
-## Contributing
+Modify `.env` file:
 
-This is a production-ready application. For enterprise customization:
-1. Fork the repository
-2. Create feature branch
-3. Implement changes
-4. Test thoroughly
-5. Submit pull request
+```env
+VITE_UPDATE_INTERVAL=5000  # Update every 5 seconds
+```
+
+## Troubleshooting
+
+### Build Issues
+
+If build fails, ensure:
+1. Node.js version >= 18.0.0
+2. All dependencies installed (`npm install`)
+3. No TypeScript errors
+4. Proper file permissions
+
+### Blank Page After Deployment
+
+If you see a blank page:
+1. Check browser console for errors
+2. Verify `base: './'` in vite.config.js
+3. Ensure nginx.conf is properly configured
+4. Check that dist/index.html uses relative paths
+
+### Dark Mode Not Working
+
+If dark mode doesn't activate:
+1. Check browser's system preference
+2. Clear browser cache
+3. Verify CSS variables in index.css
+4. Check localStorage for saved preference
 
 ## License
 
-Proprietary - All rights reserved
+MIT License - feel free to use for personal or commercial projects
 
 ## Support
 
-For technical support or enterprise inquiries, contact your system administrator.
-
----
-
-Built with React, Vite, and Tailwind CSS
+For issues, questions, or contributions, please open an issue in the project repository.
