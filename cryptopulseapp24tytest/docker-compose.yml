@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - CORS_ORIGIN=*
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.rule=Host(`${COOLIFY_FQDN:-localhost}`)"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.entrypoints=http,https"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.tls=true"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COOLIFY_RESOURCE_UUID:-app}.loadbalancer.server.port=80"
+
+networks:
+  internal:
+    driver: bridge
+  coolify:
+    external: true
