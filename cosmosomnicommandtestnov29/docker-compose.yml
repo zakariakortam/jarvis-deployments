@@ -1,54 +1,46 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: cosmos-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      backend:
-        condition: service_healthy
-    environment:
-      - NODE_ENV=production
-    networks:
-      - cosmos-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: cosmos-backend
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       - NODE_ENV=production
       - PORT=8000
-      - CORS_ORIGIN=http://localhost:3000
-    networks:
-      - cosmos-network
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/health"]
       interval: 30s
-      timeout: 3s
+      timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.rule=Host(`${COOLIFY_FQDN:-localhost}`)"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.entrypoints=http,https"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.tls=true"
+      - "traefik.http.routers.${COOLIFY_RESOURCE_UUID:-app}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COOLIFY_RESOURCE_UUID:-app}.loadbalancer.server.port=80"
 
 networks:
-  cosmos-network:
+  internal:
     driver: bridge
-    name: cosmos-network
-
-volumes:
-  cosmos-data:
-    driver: local
+  coolify:
+    external: true
