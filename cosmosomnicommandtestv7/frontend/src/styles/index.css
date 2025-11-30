@@ -1,0 +1,337 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --holo-blue: #00f0ff;
+    --holo-cyan: #00ffea;
+    --holo-purple: #b347ff;
+    --holo-pink: #ff47ab;
+    --holo-green: #00ff88;
+    --holo-orange: #ff8800;
+    --holo-red: #ff3355;
+    --holo-yellow: #ffee00;
+    --space-dark: #0a0a12;
+    --space-darker: #050508;
+  }
+}
+
+@layer components {
+  /* Panel Styles */
+  .holo-panel {
+    @apply relative bg-panel-bg backdrop-blur-md border border-panel-border rounded-lg overflow-hidden;
+    box-shadow:
+      0 0 20px rgba(0, 240, 255, 0.1),
+      inset 0 1px 0 rgba(0, 240, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 240, 255, 0.05);
+  }
+
+  .holo-panel::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 240, 255, 0.05) 0%,
+      transparent 50%,
+      rgba(179, 71, 255, 0.03) 100%
+    );
+  }
+
+  .holo-panel::after {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 240, 255, 0.5) 50%,
+      transparent 100%
+    );
+  }
+
+  /* Button Styles */
+  .holo-button {
+    @apply relative px-4 py-2 font-display text-sm uppercase tracking-wider;
+    @apply bg-transparent border border-holo-blue/50 text-holo-blue;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:bg-holo-blue/10 hover:border-holo-blue hover:shadow-holo;
+    @apply active:scale-95;
+  }
+
+  .holo-button::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 240, 255, 0.2) 0%,
+      transparent 50%
+    );
+  }
+
+  .holo-button:hover::before {
+    @apply opacity-100;
+  }
+
+  .holo-button-danger {
+    @apply border-holo-red/50 text-holo-red;
+    @apply hover:bg-holo-red/10 hover:border-holo-red hover:shadow-alert;
+  }
+
+  .holo-button-success {
+    @apply border-holo-green/50 text-holo-green;
+    @apply hover:bg-holo-green/10 hover:border-holo-green hover:shadow-success;
+  }
+
+  /* Input Styles */
+  .holo-input {
+    @apply w-full px-4 py-2 bg-space-dark/50 border border-panel-border rounded;
+    @apply font-mono text-sm text-holo-cyan placeholder-holo-blue/30;
+    @apply focus:outline-none focus:border-holo-blue focus:shadow-holo;
+    @apply transition-all duration-300;
+  }
+
+  /* Text Styles */
+  .holo-text {
+    @apply text-holo-cyan;
+    text-shadow: 0 0 10px rgba(0, 255, 234, 0.3);
+  }
+
+  .holo-text-bright {
+    @apply text-holo-blue;
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+  }
+
+  .holo-heading {
+    @apply font-display font-bold uppercase tracking-wider text-holo-blue;
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+  }
+
+  /* Status Indicators */
+  .status-indicator {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .status-online {
+    @apply bg-holo-green;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .status-warning {
+    @apply bg-holo-orange;
+    box-shadow: 0 0 10px rgba(255, 136, 0, 0.8);
+    animation: pulse-glow 1.5s ease-in-out infinite;
+  }
+
+  .status-critical {
+    @apply bg-holo-red;
+    box-shadow: 0 0 10px rgba(255, 51, 85, 0.8);
+    animation: alert-pulse 1s ease-in-out infinite;
+  }
+
+  .status-offline {
+    @apply bg-gray-500;
+    box-shadow: 0 0 5px rgba(128, 128, 128, 0.5);
+  }
+
+  /* Progress Bars */
+  .holo-progress {
+    @apply relative h-2 bg-space-dark rounded-full overflow-hidden;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+  }
+
+  .holo-progress-bar {
+    @apply h-full rounded-full transition-all duration-500;
+    background: linear-gradient(90deg, var(--holo-blue), var(--holo-cyan));
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  /* Scan Line Effect */
+  .scan-line {
+    @apply absolute inset-0 pointer-events-none overflow-hidden;
+  }
+
+  .scan-line::after {
+    content: '';
+    @apply absolute left-0 right-0 h-px bg-holo-blue/20;
+    animation: scan-line 4s linear infinite;
+  }
+
+  /* Grid Background */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Noise Texture */
+  .noise-overlay {
+    @apply absolute inset-0 pointer-events-none opacity-[0.02];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* Corner Decorations */
+  .corner-decor {
+    @apply absolute w-4 h-4;
+  }
+
+  .corner-decor::before,
+  .corner-decor::after {
+    content: '';
+    @apply absolute bg-holo-blue;
+  }
+
+  .corner-decor::before {
+    @apply w-full h-px;
+  }
+
+  .corner-decor::after {
+    @apply w-px h-full;
+  }
+
+  .corner-tl {
+    @apply top-0 left-0;
+  }
+
+  .corner-tr {
+    @apply top-0 right-0;
+  }
+
+  .corner-tr::before {
+    @apply right-0;
+  }
+
+  .corner-tr::after {
+    @apply right-0;
+  }
+
+  .corner-bl {
+    @apply bottom-0 left-0;
+  }
+
+  .corner-bl::before {
+    @apply bottom-0;
+  }
+
+  .corner-bl::after {
+    @apply bottom-0;
+  }
+
+  .corner-br {
+    @apply bottom-0 right-0;
+  }
+
+  .corner-br::before {
+    @apply right-0 bottom-0;
+  }
+
+  .corner-br::after {
+    @apply right-0 bottom-0;
+  }
+
+  /* Data Display */
+  .data-value {
+    @apply font-mono text-holo-cyan tabular-nums;
+  }
+
+  .data-label {
+    @apply text-xs uppercase tracking-wider text-holo-blue/60;
+  }
+
+  /* Holographic Effect */
+  .holographic {
+    @apply relative;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 240, 255, 0.1) 0%,
+      rgba(179, 71, 255, 0.1) 50%,
+      rgba(0, 255, 136, 0.1) 100%
+    );
+    animation: hologram 3s ease-in-out infinite;
+  }
+
+  .holographic::before {
+    content: '';
+    @apply absolute inset-0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 240, 255, 0.03) 2px,
+      rgba(0, 240, 255, 0.03) 4px
+    );
+  }
+
+  /* Glitch Effect */
+  .glitch {
+    @apply relative;
+  }
+
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    @apply absolute top-0 left-0 w-full h-full;
+  }
+
+  .glitch::before {
+    @apply text-holo-red;
+    animation: glitch-1 2s infinite linear alternate-reverse;
+  }
+
+  .glitch::after {
+    @apply text-holo-cyan;
+    animation: glitch-2 3s infinite linear alternate-reverse;
+  }
+
+  @keyframes glitch-1 {
+    0%, 100% { clip-path: inset(0 0 95% 0); transform: translate(-2px); }
+    20% { clip-path: inset(50% 0 30% 0); transform: translate(2px); }
+    40% { clip-path: inset(10% 0 80% 0); transform: translate(-2px); }
+    60% { clip-path: inset(70% 0 10% 0); transform: translate(2px); }
+    80% { clip-path: inset(30% 0 50% 0); transform: translate(-2px); }
+  }
+
+  @keyframes glitch-2 {
+    0%, 100% { clip-path: inset(95% 0 0 0); transform: translate(2px); }
+    20% { clip-path: inset(30% 0 50% 0); transform: translate(-2px); }
+    40% { clip-path: inset(80% 0 10% 0); transform: translate(2px); }
+    60% { clip-path: inset(10% 0 70% 0); transform: translate(-2px); }
+    80% { clip-path: inset(50% 0 30% 0); transform: translate(2px); }
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  .text-glow-strong {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+
+  .box-glow {
+    box-shadow: 0 0 20px currentColor;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
