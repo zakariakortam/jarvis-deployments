@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23050508' stroke='%23ff0040' stroke-width='3'/%3E%3Cpath d='M50 20 L50 50 L70 70' stroke='%2300d4ff' stroke-width='4' fill='none'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%23ff0040'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050508" />
+    <title>Sentinel Command Directorate | National Security Intelligence Platform</title>
+    <style>
+      /* Critical CSS for initial load */
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #050508;
+        overflow: hidden;
+      }
+
+      /* Loading screen */
+      .loading-screen {
+        position: fixed;
+        inset: 0;
+        background: #050508;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+
+      .loading-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loading-logo {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 30px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .loading-text {
+        color: #00d4ff;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+      }
+
+      .loading-bar {
+        width: 200px;
+        height: 2px;
+        background: #1a1a2e;
+        border-radius: 1px;
+        overflow: hidden;
+      }
+
+      .loading-bar-inner {
+        width: 30%;
+        height: 100%;
+        background: linear-gradient(90deg, #ff0040, #00d4ff);
+        animation: loading 1.5s ease-in-out infinite;
+      }
+
+      .classification-banner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #ff0040;
+        color: white;
+        text-align: center;
+        padding: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 2px;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.8; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.05); }
+      }
+
+      @keyframes loading {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(400%); }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-C3oZ-n6k.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/vendor-doT7tLoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-B_yPAo-f.js">
+    <link rel="modulepreload" crossorigin href="./assets/animation-Ckcpk1JL.js">
+    <link rel="modulepreload" crossorigin href="./assets/visualization--5mflZhK.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-BOwojSig.css">
+  </head>
+  <body>
+    <div id="root">
+      <!-- Loading screen shown before React hydrates -->
+      <div class="loading-screen" id="loading-screen">
+        <div class="classification-banner">TOP SECRET // SCI // NOFORN</div>
+        <svg class="loading-logo" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#00d4ff" stroke-width="2" stroke-dasharray="70 213" stroke-linecap="round">
+            <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="50" cy="50" r="30" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+          <circle cx="50" cy="50" r="30" fill="none" stroke="#ff0040" stroke-width="2" stroke-dasharray="47 141" stroke-linecap="round">
+            <animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="50" cy="50" r="8" fill="#ff0040"/>
+        </svg>
+        <div class="loading-text">INITIALIZING SECURE CONNECTION</div>
+        <div class="loading-bar">
+          <div class="loading-bar-inner"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Hide loading screen when React is ready
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+            setTimeout(function() {
+              loadingScreen.remove();
+            }, 500);
+          }
+        }, 1500);
+      });
+    </script>
+  </body>
+</html>
