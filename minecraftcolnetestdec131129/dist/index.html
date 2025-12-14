@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A fully-featured Minecraft clone built for the web with Three.js" />
+    <title>WebCraft - Minecraft Clone</title>
+    <style>
+      @font-face {
+        font-family: 'Minecraft';
+        src: url('https://fonts.cdnfonts.com/s/25296/Minecraft.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body, #root {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #1a1a2e;
+      }
+
+      body {
+        font-family: 'Minecraft', monospace;
+      }
+
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      .loading-title {
+        font-family: 'Minecraft', monospace;
+        font-size: 48px;
+        color: #fff;
+        text-shadow: 4px 4px 0 #000;
+        margin-bottom: 40px;
+      }
+
+      .loading-bar-container {
+        width: 300px;
+        height: 20px;
+        background: #333;
+        border: 3px solid #555;
+        position: relative;
+      }
+
+      .loading-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #5a8c32, #7ab648);
+        animation: loading 2s ease-in-out infinite;
+      }
+
+      @keyframes loading {
+        0% { width: 0%; }
+        50% { width: 80%; }
+        100% { width: 100%; }
+      }
+
+      .loading-text {
+        color: #aaa;
+        margin-top: 20px;
+        font-size: 14px;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-Q9rf2oSO.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/vendor-jCwM7lNR.js">
+    <link rel="modulepreload" crossorigin href="./assets/three-DOEcZD__.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-Dt0PitVA.css">
+  </head>
+  <body>
+    <div id="root">
+      <div class="loading-screen">
+        <div class="loading-title">WebCraft</div>
+        <div class="loading-bar-container">
+          <div class="loading-bar"></div>
+        </div>
+        <div class="loading-text">Loading world...</div>
+      </div>
+    </div>
+  </body>
+</html>
