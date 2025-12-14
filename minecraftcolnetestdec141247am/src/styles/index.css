@@ -1,0 +1,767 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Minecraft';
+  src: url('https://fonts.cdnfonts.com/s/25296/Minecraft.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --minecraft-dark: #1a1a1a;
+  --minecraft-stone: #7f7f7f;
+  --minecraft-dirt: #8b6914;
+  --minecraft-grass: #5a8c32;
+  --minecraft-wood: #6b5344;
+  --minecraft-water: #3366cc;
+  --ui-bg: rgba(0, 0, 0, 0.7);
+  --ui-border: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Minecraft', monospace;
+}
+
+body {
+  background: #1a1a2e;
+}
+
+/* Game Container */
+.game-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.game-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* UI Layer */
+.ui-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.ui-layer > * {
+  pointer-events: auto;
+}
+
+/* Crosshair */
+.crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.crosshair-h {
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+
+.crosshair-v {
+  position: absolute;
+  width: 2px;
+  height: 24px;
+  background: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+
+/* Hotbar */
+.hotbar-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.selected-item-name {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.hotbar {
+  display: flex;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.hotbar-slot {
+  width: 48px;
+  height: 48px;
+  background: rgba(50, 50, 50, 0.9);
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.hotbar-slot.selected {
+  border-color: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.hotbar-slot:hover {
+  background: rgba(70, 70, 70, 0.9);
+}
+
+.slot-block {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.block-3d-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(0,0,0,0.3) 100%);
+  border-radius: 4px;
+}
+
+/* 3D Block Preview in Hotbar */
+.slot-block-3d {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  transform: rotateX(15deg) rotateY(-25deg);
+  transform-style: preserve-3d;
+}
+
+.block-face {
+  position: absolute;
+  image-rendering: pixelated;
+}
+
+.block-face.top {
+  width: 20px;
+  height: 12px;
+  top: 0;
+  left: 4px;
+  transform: rotateX(60deg) translateY(-6px);
+  filter: brightness(1.1);
+}
+
+.block-face.front {
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  left: 4px;
+  filter: brightness(0.85);
+}
+
+.block-face.side {
+  width: 12px;
+  height: 20px;
+  bottom: 0;
+  right: -2px;
+  transform: skewY(-30deg);
+  filter: brightness(0.7);
+}
+
+.slot-count {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  color: white;
+  font-size: 12px;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.slot-number {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+}
+
+/* Debug Panel */
+.debug-panel {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #aaa;
+  font-size: 12px;
+  font-family: monospace;
+  padding: 10px;
+  border-radius: 4px;
+  max-width: 300px;
+  pointer-events: none;
+}
+
+.debug-section {
+  margin-bottom: 10px;
+}
+
+.debug-section:last-child {
+  margin-bottom: 0;
+}
+
+.debug-title {
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 2px;
+}
+
+.debug-line {
+  color: #888;
+  font-size: 11px;
+}
+
+.debug-section.controls {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #444;
+}
+
+/* Main Menu */
+.main-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.menu-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #1a3a1a 0%, #0f1f0f 50%, #1a1a2e 100%);
+  overflow: hidden;
+}
+
+.floating-blocks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.floating-block {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #5a8c32 0%, #3a5c22 100%);
+  opacity: 0.2;
+  animation: float 20s infinite ease-in-out;
+  bottom: -50px;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-120vh) rotate(360deg);
+  }
+}
+
+.menu-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px;
+}
+
+.game-title {
+  font-size: 72px;
+  margin-bottom: 10px;
+  text-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.3);
+}
+
+.title-web {
+  color: #5a8c32;
+}
+
+.title-craft {
+  color: #8b6914;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 16px;
+  margin-bottom: 40px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.menu-btn {
+  background: #555;
+  border: 3px solid #333;
+  border-top-color: #777;
+  border-left-color: #777;
+  color: white;
+  padding: 12px 40px;
+  font-size: 16px;
+  font-family: 'Minecraft', monospace;
+  cursor: pointer;
+  min-width: 250px;
+  text-shadow: 2px 2px 0 #000;
+  transition: all 0.1s;
+}
+
+.menu-btn:hover {
+  background: #666;
+}
+
+.menu-btn:active {
+  border-top-color: #333;
+  border-left-color: #333;
+  border-bottom-color: #777;
+  border-right-color: #777;
+}
+
+.menu-btn.primary {
+  background: #3a6a3a;
+  border-top-color: #5a8a5a;
+  border-left-color: #5a8a5a;
+}
+
+.menu-btn.primary:hover {
+  background: #4a7a4a;
+}
+
+.menu-btn.danger {
+  background: #6a3a3a;
+  border-top-color: #8a5a5a;
+  border-left-color: #8a5a5a;
+}
+
+.menu-btn.danger:hover {
+  background: #7a4a4a;
+}
+
+.menu-btn.small {
+  padding: 8px 20px;
+  font-size: 12px;
+  min-width: 150px;
+}
+
+.menu-footer {
+  margin-top: 40px;
+  color: #666;
+  font-size: 12px;
+}
+
+.menu-footer p {
+  margin: 4px 0;
+}
+
+/* New World Form */
+.new-world-form {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 30px;
+  border-radius: 8px;
+  border: 2px solid #444;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  color: #aaa;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  background: #333;
+  border: 2px solid #555;
+  color: white;
+  font-family: 'Minecraft', monospace;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #5a8c32;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Pause Menu */
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pause-menu {
+  background: rgba(30, 30, 30, 0.95);
+  padding: 40px;
+  border-radius: 8px;
+  border: 2px solid #444;
+  text-align: center;
+  min-width: 400px;
+}
+
+.pause-title {
+  color: white;
+  font-size: 32px;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.settings-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.settings-section h3 {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #888;
+  font-size: 12px;
+}
+
+.setting-row input[type="range"] {
+  width: 120px;
+}
+
+.setting-row input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-title {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 30px;
+}
+
+.loading-bar-container {
+  width: 300px;
+  height: 20px;
+  background: #333;
+  border: 2px solid #555;
+  margin-bottom: 20px;
+}
+
+.loading-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3a6a3a, #5a8c32);
+  transition: width 0.3s ease;
+}
+
+.loading-info {
+  color: #888;
+  font-size: 12px;
+}
+
+.loading-tips {
+  margin-top: 30px;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Inventory */
+.inventory-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.inventory-container {
+  background: rgba(50, 50, 50, 0.95);
+  padding: 20px;
+  border-radius: 8px;
+  border: 3px solid #333;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.inventory-header h2 {
+  color: white;
+  font-size: 18px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: white;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 40px);
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.inventory-hotbar {
+  display: grid;
+  grid-template-columns: repeat(9, 40px);
+  gap: 2px;
+  padding-top: 10px;
+  border-top: 2px solid #444;
+}
+
+.inventory-slot {
+  width: 40px;
+  height: 40px;
+  background: rgba(60, 60, 60, 0.95);
+  border: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.inventory-slot:hover {
+  background: rgba(80, 80, 80, 0.95);
+}
+
+.inventory-slot.selected {
+  border-color: #5a8c32;
+  box-shadow: 0 0 5px rgba(90, 140, 50, 0.5);
+}
+
+.inventory-slot.hotbar-row {
+  border-color: #555;
+}
+
+.item-info {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.item-name {
+  color: white;
+  font-size: 14px;
+}
+
+.item-count {
+  color: #888;
+  font-size: 14px;
+}
+
+/* Error Screen */
+.error-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.error-content {
+  text-align: center;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  border: 2px solid #6a3a3a;
+  max-width: 500px;
+}
+
+.error-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(200, 50, 50, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: #ff6666;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.error-content h2 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.error-content p {
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.error-details {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 4px;
+  color: #ff6666;
+  font-size: 12px;
+  text-align: left;
+  overflow: auto;
+  max-height: 100px;
+  margin-bottom: 20px;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #5555ff;
+  padding: 8px 12px;
+  color: white;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+/* Animations */
+@keyframes blockBreak {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes blockPlace {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
