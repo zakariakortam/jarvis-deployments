@@ -1,0 +1,31 @@
+{
+  "name": "reactor-simulator",
+  "version": "2.0.0",
+  "description": "Advanced Nuclear Reactor Simulator - PWR Control System",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.jsx"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@react-three/postprocessing": "^2.15.11",
+    "immer": "^11.0.1",
+    "leva": "^0.10.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.181.2",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "eslint": "^8.57.0",
+    "vite": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
